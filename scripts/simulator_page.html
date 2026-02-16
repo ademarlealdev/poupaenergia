@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+  	<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-M5MQ9KW');</script>
+<!-- End Google Tag Manager -->
+<style>
+  .filter-wrapper .filter-line#Gas100Verde {
+    display: none !important;
+  }
+#offer-results .offer-header .header-label.col-xs-5:not([data-translate]) {
+    visibility: hidden !important;
+  }
+</style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:site_name" content="Simulador e Comparador de Ofertas Comerciais" />
+    <meta property="og:url" content="https://simuladorprecos.erse.pt/eletricidade/" />
+
+    
+    <meta charset="utf-8" />
+    <title>Simulador e Comparador de Ofertas Comerciais - Eletricidade</title>
+    
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700" rel="stylesheet">
+    <link href="/bundles/8ba7498c5160579e836aa5cff75c98ef/fcae7115-206d-46b7-8c5e-01b6b7869728/erse.css?ts=1" rel="stylesheet" type="text/css">
+    
+    <link rel="shortcut icon" href="/favicon.ico" />
+      
+    <script src="/bundles/8ba7498c5160579e836aa5cff75c98ef/887ceb72-99e3-45ba-937f-8d613ebaea16/erse.max.js?ts=1"></script>
+    
+
+    
+
+    
+</head>
+<body>
+    
+
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M5MQ9KW"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<script>
+$(document).ready(function() {
+    // Fix: Definir filtro_Fidelizacao para 1
+    $('#filtro_Fidelizacao').val('1');
+    $('#f8').prop('checked', true);
+    
+    // Fix: Corrigir botão "Limpar Filtros"
+    $('.clear-filters').on('click', function() {
+        setTimeout(function() {
+            $('#filtro_Fidelizacao').val('1');
+            $('#f8').prop('checked', true);
+        }, 50);
+    });
+});
+</script>
+
+<script>
+(function($) {
+    'use strict';
+    function addTipoPrecoFilter() {
+        var filterWrapper = $('.filter-wrapper');
+        
+        if (filterWrapper.length === 0) {
+            console.error('Filter wrapper not found');
+            return;
+        }
+        // Check if the filter already exists to avoid duplicates
+        if (filterWrapper.find('input[name="TipoPreco"]').length > 0) {
+            console.log('Tipo de Preço filter already exists');
+            return;
+        }
+        
+        // Check window size and add 'hidden' class if >= 768px
+        var hiddenClass = $(window).width() >= 768 ? ' hidden' : '';
+        
+        // Create the new filter HTML (matching the structure of other mobile radio filters)
+        var tipoPrecoFilterHTML = 
+            '<div class="filter-line radios' + hiddenClass + '">' +
+                '<div data-translate="OUT_FILT_TIPO_PRECO">Tipo de Preço</div>' +
+                '<div><input type="radio" name="TipoPreco" id="TipoPreco1" value="1" class="checkbox" checked=""><label for="TipoPreco1" data-translate="OUT_FILT_TIPO_PRECO_QUALQUER">Qualquer</label></div>' +
+                '<div><input type="radio" name="TipoPreco" id="TipoPreco2" value="2" class="checkbox"><label for="TipoPreco2" data-translate="OUT_FILT_TIPO_PRECO_PRECOS_INDEXADOS">Preço indexado</label></div>' +
+                '<div><input type="radio" name="TipoPreco" id="TipoPreco3" value="3" class="checkbox"><label for="TipoPreco3" data-translate="OUT_FILT_TIPO_PRECO_PRECOS_FIXOS">Preço Fixo</label></div>' +
+            '</div>';
+        // Find the Segmento filter and insert after it
+        var segmentoFilter = filterWrapper.find('.filter-line.radios').first();
+        
+        if (segmentoFilter.length > 0) {
+            segmentoFilter.after(tipoPrecoFilterHTML);
+        } else {
+            filterWrapper.append(tipoPrecoFilterHTML);
+        }
+        console.log('Tipo de Preço filter added successfully');
+    }
+    function bindTipoPrecoEvents() {
+        // Handle mobile radio button changes
+        $(document).on('change', 'input[name="TipoPreco"]', function() {
+            var selectedValue = $(this).val();
+            
+            // Simulate clicking the corresponding desktop dropdown <li>
+            // This replicates what happens in the existing dropdown click handler
+            var desktopDropdown = $('dropdown[data-col="TipoPrecoEle"]');
+            
+            if (desktopDropdown.length > 0) {
+                // Update desktop dropdown UI
+                desktopDropdown.find('li').removeClass('active');
+                var selectedLi = desktopDropdown.find('li[value="' + selectedValue + '"]');
+                selectedLi.addClass('active');
+                desktopDropdown.find('label .dropTitle').html(selectedLi.text());
+                desktopDropdown.find('label .dropTitle').attr('data-translate', selectedLi.data('translate'));
+            }
+            
+            // Update the hidden filter field (same as desktop dropdown does)
+            $('#filtro_TipoOfertaELE').val(selectedValue);
+            
+            // Trigger the simulation
+            $(".simulate-2").click();
+        });
+        // Sync desktop dropdown changes to mobile radio buttons
+        $(document).on('click', 'dropdown[data-col="TipoPrecoEle"] li', function() {
+            var selectedValue = $(this).attr('value');
+            $('input[name="TipoPreco"][value="' + selectedValue + '"]').prop('checked', true);
+        });
+    }
+    // Initialize
+    $(document).ready(function() {
+        addTipoPrecoFilter();
+        bindTipoPrecoEvents();
+    });
+})(jQuery);
+</script>
+<div class="loaderHover" style="display: none;">
+	<div style="top: 50%;left: 50%;margin-top: -100px;margin-left: -100px;width: 200px;height: 200px;position: absolute;">
+		<img class="loaderLogo" src="/bundles/8ba7498c5160579e836aa5cff75c98ef/fcae7115-206d-46b7-8c5e-01b6b7869728/images/e-Erse.svg">      
+    	<img class="loaderRotate" src="/bundles/8ba7498c5160579e836aa5cff75c98ef/fcae7115-206d-46b7-8c5e-01b6b7869728/images/Eclipse-1s-200px.gif">
+    </div>
+</div>
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/"><img src="https://simuladorpotencia.erse.pt/static/share/2026-01/2932bd51-18a3-4c09-ac91-dd5c676af085/61c95db7-8cba-40be-9cf1-b523355f6b3c/Logo/cd77123f-8519-4bea-8ad4-2d6ca1d16a40/20260115181408/logo_erse.png" alt="logo" /></a>
+            <button type="button" class="hamburger navbar-toggle" data-toggle="collapse" data-target="#navbar" aria-expanded="true" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+        </div>
+
+        <div id="navbar" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav navbar-left relative" id="mobile-menu">
+                <li class="dropdown filter-name-menu lang">
+                    <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><span class=" default-color-xs"></span> <span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a></a></li>
+                    </ul>
+                </li>
+                <hr class="hidden-lg hidden-md hidden-sm" style="margin: 0 -15px;" />
+                <li class="dropdown filter-name-menu">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="icon icon-contrast micro inline"></i><span class="l10 hidden-lg hidden-md hidden-sm default-color">Contraste</span><span class="caret"></span></a>
+                    <ul class="dropdown-menu menu-wide" role="menu">
+                        <li><a class="contrast-off">Normal</a></li>
+                        <li><a class="contrast-on">Alto Contraste</a></li>
+                    </ul>
+                </li>
+                <hr class="hidden-lg hidden-md hidden-sm" style="margin: 0 -15px;" />
+                <li class="dropdown filter-name-menu">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="icon icon-text-height micro inline"></i><span class="l10 hidden-lg hidden-md hidden-sm default-color">Tamanho de Letra</span><span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a class="font" data-px="14"><span class="font14">aA</span></a></li>
+                        <li><a class="font" data-px="16"><span class="font16">aA</span></a></li>
+                        <li><a class="font" data-px="18"><span class="font18">aA</span></a></li>
+                        <li><a class="font" data-px="20"><span class="font20">aA</span></a></li>
+                        <li><a class="font" data-px="22"><span class="font22">aA</span></a></li>
+                    </ul>
+                </li>
+                <hr class="hidden-lg hidden-md hidden-sm" style="margin: 0 -15px;" />
+            </ul>
+            <div class="container hidden-lg hidden-md hidden-sm" id="mobile-filters">
+            </div>
+        </div>
+        <div class="overlay"></div>
+            <ul id="simulator-options" class="nav navbar-nav navbar-right relative">
+                <li class="hidden-sm hidden-md hidden-lg erse-icon">
+                    <a href="/"><img src="/bundles/8ba7498c5160579e836aa5cff75c98ef/fcae7115-206d-46b7-8c5e-01b6b7869728/images/erse-e.png" style="margin-top: -30px;"></a>
+                </li>
+                    <li>
+                        <a href="/eletricidade/">
+                            <div>
+                                        <i class='icon-1 color-1'></i>
+                            </div>
+                            <div data-translate="SIM_ELETRICIDADE"></div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gas/">
+                            <div>
+                                        <i  class='icon-2'></i>
+                            </div>
+                            <div data-translate="SIM_G&#193;S_NATURAL"></div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/eletricidade-e-gas-natural/">
+                            <div>
+                                        <i  class='icon-3'></i>
+                            </div>
+                            <div data-translate="SIM_ELETRICIDADE_E_G&#193;S_NATURAL"></div>
+                        </a>
+                    </li>
+            </ul>
+    </div>
+</nav>
+
+
+  
+<style>
+  #simulator-options{
+    visibility: hidden;
+  }
+</style>
+
+<div class="container-fluid relative">
+    <form id="simulation" class="eletricidade">
+        <input type="hidden" id="service-url" value="/connectors/simular_eletricidade/" />
+  		<input type="hidden" id="service-type" value="eletricidade" value="1" />
+  		<input type="hidden" id="idioma" name="idioma" />
+  		<input type="hidden" id="socialOffer" name="socialOffer" value="1" />
+  		<input type="hidden" id="filtro_IndexacaoSpot" name="filtro_IndexacaoSpot" value="1" />  		
+  		<input type="hidden" id="filtro_ServicosAdicionais" name="filtro_ServicosAdicionais" value="0" />
+  		<input type="hidden" id="filtro_SemRestricoesAdicionais" name="filtro_SemRestricoesAdicionais" value="1" />  		
+  		<input type="hidden" id="filtro_SemPrecosIndexados" name="filtro_SemPrecosIndexados" value="1" />
+  		<input type="hidden" id="filtro_SemReembolsos" name="filtro_SemReembolsos" value="1" />
+  		<input type="hidden" id="filtro_energia100Renovavel" name="filtro_energia100Renovavel" value="0" />
+  		<input type="hidden" id="filtro_Fidelizacao" name="filtro_Fidelizacao" value="0" />
+  		<input type="hidden" id="filtro_FamiliasNumerosas" name="filtro_FamiliasNumerosas" value="0" />
+  		<input type="hidden" id="filtro_NovosClientes" name="filtro_NovosClientes" value="1" />
+  		<input type="hidden" id="pageStartIndex" name="pageStartIndex" value="0" />
+  		<input type="hidden" id="pageStep" name="pageStep" value="10" />
+  		<input type="hidden" id="filtro_comercializadores" name="filtro_comercializadores" value="" />
+   
+   		<input type="hidden" id="filtro_contratacao" name="filtro_contratacao" value="1" />
+        <input type="hidden" id="filtro_faturacao" name="filtro_faturacao" value="1" />
+        <input type="hidden" id="filtro_pagamento" name="filtro_pagamento" value="1" />
+  		
+  		<input type="hidden" id="filtro_TipoOfertaELE" name="filtro_TipoOfertaELE" value="1" />
+  		<input type="hidden" id="filtro_TipoOfertaGas" name="filtro_TipoOfertaGas" value="1" />
+  		<input type="hidden" id="filtro_gas100Renovavel" name="filtro_gas100Renovavel" value="0" />
+  
+  		<div id="input-params" class="row" style="background-color:#EEEEEE">
+  			<div class="container">
+  			<div class="row section" id="section-1">
+    <div class="col-md-12 text24" data-translate="GERAL_SECCAO"></div>
+    <div class="col-md-8 col-xs-10 text40 question" data-translate="GERAL_PERGUNTA_1"></div>
+    <div class="col-md-4 col-xs-2 infoParent">
+        <i class="icon-24" onclick=""></i>
+        <div class="info" data-translate="GERAL_BALAO_1"></div>
+    </div>
+    <div class="col-md-12 col-xs-12">
+        <div class="row options">
+            <div class="col-md-2 col-sm-12 text24 box-middle" data-translate="GERAL_CATEGORIA_1.1"></div>
+            <div class="col-xs-1 hidden-sm hidden-md hidden-lg">&nbsp;</div>
+            <div class="col-sm-2 col-xs-5 col-xs">
+                <div class="text-center marginPrice" data-translate="GERAL_PERGUNTA_1_BOTAO_1_ELE_CUSTO"></div>
+                <input type="radio" id="caseType0" name="caseType" value="0" data-val="Casal sem filhos" />
+                <label class="ll ltype1" for="caseType0">
+                    <div class='square-box'>
+                        <div class="tick-wrapper"></div>
+                        <span class="tick icon-checkmark"></span>
+                        <div class='square-content'>
+                            <div>
+                                <span class="icon icon-8">
+                                    <br />
+                                    <span class="text-icon" data-translate="GERAL_PERGUNTA_1_BOTAO_1_ELE"></span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </label>
+            </div>
+            <div class="col-sm-2 col-xs-5 col-xs">
+                <div class="text-center marginPrice" data-translate="GERAL_PERGUNTA_1_BOTAO_2_ELE_CUSTO"></div>
+                <input type="radio" id="caseType1" name="caseType" value="1" data-val="Casal com 2 filhos" />
+                <label class="ll ltype2" " for="caseType1">
+                    <div class='square-box'>
+                        <div class="tick-wrapper"></div>
+                        <span class="tick icon-checkmark"></span>
+                        <div class='square-content'>
+                            <div>
+                                <span class="icon icon-7">
+                                    <br />
+                                    <span class="text-icon" data-translate="GERAL_PERGUNTA_1_BOTAO_2_ELE"></span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </label>
+            </div>
+            <div class="col-xs-1 hidden-sm hidden-md hidden-lg">&nbsp;</div>
+            <div class="col-xs-1 hidden-sm hidden-md hidden-lg clear">&nbsp;</div>
+            <div class="col-sm-2 col-xs-5 col-xs">
+                <div class="box150">
+                    <div class="text-center marginPrice" data-translate="GERAL_PERGUNTA_1_BOTAO_3_ELE_CUSTO"></div>
+                    <input type="radio" id="caseType2" name="caseType" value="2" data-val="Casal com 4 filhos" />
+                    <label class="ll ltype3" " for="caseType2">
+                        <div class='square-box'>
+                            <div class="tick-wrapper"></div>
+                            <span class="tick icon-checkmark"></span>
+                            <div class='square-content'>
+                                <div>
+
+                                    <span class="icon icon-6">
+                                        <br />
+                                        <span class="text-icon" data-translate="GERAL_PERGUNTA_1_BOTAO_3_ELE"></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+            <div class="col-sm-2 col-xs-5 col-xs">
+                <div class="box150">
+                    <div class="text-center marginPrice" data-translate="GERAL_PERGUNTA_1_BOTAO_6_ELE_CUSTO"></div>
+                    <input type="radio" id="caseType5" name="caseType" value="5" data-type="fast" data-val="A sua fatura" />
+                    <label class="ll ltype3" " for="caseType5">
+                        <div class='square-box'>
+                            <div class="tick-wrapper"></div>
+                            <span class="tick icon-checkmark"></span>
+                            <div class='square-content'>
+                                <div>
+                                    <span class="icon icon-38-sr" data-title="GERAL_CASO_TIPO_5_ELE">
+                                        <br />
+                                        <span class="text-icon" data-translate="GERAL_PERGUNTA_1_BOTAO_6_ELE"></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="row options">
+            <div class="col-md-2 col-sm-12 text24 box-middle" data-translate="GERAL_CATEGORIA_1.2"></div>
+            <div class="col-xs-1 hidden-sm hidden-md hidden-lg">&nbsp;</div>
+            <div class="col-sm-2 col-xs-5 col-xs">
+                <input type="radio" id="caseType3" name="caseType" value="3" data-type="personalized" data-val="Fatura de consumidor doméstico" />
+                <label class="ll" for="caseType3">
+                    <div class='square-box'>
+                        <div class="tick-wrapper"></div>
+                        <span class="tick"></span>
+                        <div class='square-content'>
+                            <div>
+                                <span class="icon-small icon-5">
+                                    <br />
+                                    <span class="text-icon top-space" data-translate="GERAL_PERGUNTA_1_BOTAO_4"></span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </label>
+            </div>
+            <div class="col-sm-2 col-xs-5 col-xs">
+                <input type="radio" id="caseType4" name="caseType" value="4" data-type="personalized" data-val="Fatura de consumidor não doméstico" />
+                <label class="ll" for="caseType4">
+                    <div class='square-box'>
+                        <div class="tick-wrapper"></div>
+                        <span class="tick icon-checkmark"></span>
+                        <div class='square-content'>
+                            <div>
+                                <span class="icon-small icon-4">
+                                    <br />
+                                    <span class="text-icon top-space" data-translate="GERAL_PERGUNTA_1_BOTAO_5"></span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </label>
+            </div>
+            <div class="col-xs-1 hidden-sm hidden-md hidden-lg">&nbsp;</div>
+        </div>
+    </div>
+</div>
+
+
+  			
+
+<div class="row section fast" id="section-elect-fast">
+  <div class="col-md-8 col-xs-10 text40 question" data-translate="ELE_PERGUNTA_8"></div>
+    <div class="col-md-4 col-xs-2 infoParent">
+        <i class="icon-24" onclick=""></i>
+        <div class="info" data-translate="ELE_BALAO_8"></div>
+    </div>
+    <div class="col-md-8 col-xs-12">
+        <div class="row options">
+            <div class="col-md-3 col-xs-4">
+                <input type="number" name="electFastEuro" id="electFastEuro" step="0.0001" />
+            </div>
+            <div class="col-md-8 col-xs-8 nopadding text24 top-space" data-translate="ELE_OPCAO_RAPIDA_PRECO"></div>
+        </div>
+        <div class="row options pad-top">
+            <div class="col-md-3 col-xs-4">
+                <input type="number" name="electFastDays" id="electFastDays" step="0.0001"/>
+            </div>
+            <div class="col-md-6 col-xs-6 nopadding text24 top-space"  data-translate="ELE_OPCAO_RAPIDA_DIAS"></div>
+        </div>
+    </div>
+</div>
+
+<div class="row section" id="section-2">
+    <div class="col-md-12 text24" data-translate="ELE_SECCAO_2"></div>
+    <div class="col-md-8 col-xs-10 text40 question" data-translate="ELE_PERGUNTA_2"></div>
+    <div class="col-md-4 col-xs-2 infoParent">
+        <i class="icon-24" onclick=""></i>
+        <div class="info" data-translate="ELE_BALAO_2"></div>
+    </div>
+    <div class="col-md-8 col-xs-12">
+        <div class="row options options2">
+                <div class="col-md-3 col-xs-4">
+                    <input type="radio" id="electSupply1" name="electSupply" value="0" data-val="1,15" class="required" />
+                    <label for="electSupply1" class="electSupplyFont relative">
+                        <div class="tick-wrapper"></div>
+                        <span class="tick"></span>
+                        <span class="rect-content text24 pad-10">1,15 <span class="text18">kVA</span></span>
+                    </label>
+                </div>
+                <div class="col-md-3 col-xs-4">
+                    <input type="radio" id="electSupply2" name="electSupply" value="1" data-val="2,3" class="required" />
+                    <label for="electSupply2" class="electSupplyFont relative">
+                        <div class="tick-wrapper"></div>
+                        <span class="tick"></span>
+                        <span class="rect-content text24 pad-10">2,3 <span class="text18">kVA</span></span>
+                    </label>
+                </div>
+                <div class="col-md-3 col-xs-4">
+                    <input type="radio" id="electSupply3" name="electSupply" value="2" data-val="3,45" class="required" />
+                    <label for="electSupply3" class="electSupplyFont relative">
+                        <div class="tick-wrapper"></div>
+                        <span class="tick"></span>
+                        <span class="rect-content text24 pad-10">3,45 <span class="text18">kVA</span></span>
+                    </label>
+                </div>
+                <div class="col-md-3 col-xs-4">
+                    <input type="radio" id="electSupply4" name="electSupply" value="3" data-val="4,60" class="required" />
+                    <label for="electSupply4" class="electSupplyFont relative">
+                        <div class="tick-wrapper"></div>
+                        <span class="tick"></span>
+                        <span class="rect-content text24 pad-10">4,60 <span class="text18">kVA</span></span>
+                    </label>
+                </div>
+                <div class="col-md-3 col-xs-4">
+                    <input type="radio" id="electSupply5" name="electSupply" value="4" data-val="5,75" class="required" />
+                    <label for="electSupply5" class="electSupplyFont relative">
+                        <div class="tick-wrapper"></div>
+                        <span class="tick"></span>
+                        <span class="rect-content text24 pad-10">5,75 <span class="text18">kVA</span></span>
+                    </label>
+                </div>
+                <div class="col-md-3 col-xs-4">
+                    <input type="radio" id="electSupply6" name="electSupply" value="5" data-val="6,9" class="required" />
+                    <label for="electSupply6" class="electSupplyFont relative">
+                        <div class="tick-wrapper"></div>
+                        <span class="tick"></span>
+                        <span class="rect-content text24 pad-10">6,9 <span class="text18">kVA</span></span>
+                    </label>
+                </div>
+                <div class="col-md-3 col-xs-4">
+                    <input type="radio" id="electSupply7" name="electSupply" value="6" data-val="10,35" class="required" />
+                    <label for="electSupply7" class="electSupplyFont relative">
+                        <div class="tick-wrapper"></div>
+                        <span class="tick"></span>
+                        <span class="rect-content text24 pad-10">10,35 <span class="text18">kVA</span></span>
+                    </label>
+                </div>
+                <div class="col-md-3 col-xs-4">
+                    <input type="radio" id="electSupply8" name="electSupply" value="7" data-val="13,8" class="required" />
+                    <label for="electSupply8" class="electSupplyFont relative">
+                        <div class="tick-wrapper"></div>
+                        <span class="tick"></span>
+                        <span class="rect-content text24 pad-10">13,8 <span class="text18">kVA</span></span>
+                    </label>
+                </div>
+                <div class="col-md-3 col-xs-4">
+                    <input type="radio" id="electSupply9" name="electSupply" value="8" data-val="17,25" class="required" />
+                    <label for="electSupply9" class="electSupplyFont relative">
+                        <div class="tick-wrapper"></div>
+                        <span class="tick"></span>
+                        <span class="rect-content text24 pad-10">17,25 <span class="text18">kVA</span></span>
+                    </label>
+                </div>
+                <div class="col-md-3 col-xs-4">
+                    <input type="radio" id="electSupply10" name="electSupply" value="9" data-val="20,7" class="required" />
+                    <label for="electSupply10" class="electSupplyFont relative">
+                        <div class="tick-wrapper"></div>
+                        <span class="tick"></span>
+                        <span class="rect-content text24 pad-10">20,7 <span class="text18">kVA</span></span>
+                    </label>
+                </div>
+                <div class="col-md-3 col-xs-4">
+                    <input type="radio" id="electSupply11" name="electSupply" value="10" data-val="27,6" class="required" />
+                    <label for="electSupply11" class="electSupplyFont relative">
+                        <div class="tick-wrapper"></div>
+                        <span class="tick"></span>
+                        <span class="rect-content text24 pad-10">27,6 <span class="text18">kVA</span></span>
+                    </label>
+                </div>
+                <div class="col-md-3 col-xs-4">
+                    <input type="radio" id="electSupply12" name="electSupply" value="11" data-val="34,5" class="required" />
+                    <label for="electSupply12" class="electSupplyFont relative">
+                        <div class="tick-wrapper"></div>
+                        <span class="tick"></span>
+                        <span class="rect-content text24 pad-10">34,5 <span class="text18">kVA</span></span>
+                    </label>
+                </div>
+                <div class="col-md-3 col-xs-4">
+                    <input type="radio" id="electSupply13" name="electSupply" value="12" data-val="41,4" class="required" />
+                    <label for="electSupply13" class="electSupplyFont relative">
+                        <div class="tick-wrapper"></div>
+                        <span class="tick"></span>
+                        <span class="rect-content text24 pad-10">41,4 <span class="text18">kVA</span></span>
+                    </label>
+                </div>
+        </div>
+    </div>
+</div>
+
+<div class="row section" id="section-3">
+    <div class="col-md-8 col-xs-10 text40 question" data-translate="ELE_PERGUNTA_3"></div>
+    <div class="col-md-4 col-xs-2 infoParent">
+        <i class="icon-24" onclick=""></i>
+        <div class="info" data-translate="ELE_BALAO_3"></div>
+    </div>
+    <div class="col-md-8 col-xs-12">
+        <div class="row options">
+            <div class="col-xs-1 hidden-sm hidden-md hidden-lg">&nbsp;</div>          
+            <div class="col-sm-3 col-xs-5 col-xs">
+                <input type="radio" id="cycle1" name="cycle" value="1" data-val="Simples" />
+                <label class="ll" for="cycle1">
+                    <div class='square-box'>
+                        <div class="tick-wrapper"></div>
+                        <span class="tick"></span>
+                        <div class='square-content'>
+                            <div>
+                                <span class="icon-small icon-9">
+                                    <br />
+                                    <span class="text-icon top-space" data-translate="ELE_OPCAO_SIMPLES"></span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </label>
+            </div>
+            <div class="col-sm-3 col-xs-5 col-xs">
+                <input type="radio" id="cycle2" name="cycle" value="2" data-val="Bi-Horária" />
+                <label class="ll" for="cycle2">
+                    <div class='square-box'>
+                        <div class="tick-wrapper"></div>
+                        <span class="tick"></span>
+                        <div class='square-content'>
+                            <div>
+                                <span class="icon-small icon-10">
+                                    <br />
+                                    <span class="text-icon top-space" data-translate="ELE_OPCAO_BI_HORARIA"></span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </label>
+            </div>
+            <div class="col-xs-1 hidden-sm hidden-md hidden-lg">&nbsp;</div> 
+            <div class="col-xs-1 hidden-sm hidden-md hidden-lg clear">&nbsp;</div>
+            <div class="col-sm-3 col-xs-5 col-xs">
+                <input type="radio" id="cycle3" name="cycle" value="3" data-val="Tri-Horária" />
+                <label class="ll" for="cycle3">
+                    <div class='square-box'>
+                        <div class="tick-wrapper"></div>
+                        <span class="tick"></span>
+                        <div class='square-content'>
+                            <div>
+                                <span class="icon-small icon-11">
+                                    <br />
+                                    <span class="text-icon top-space" data-translate="ELE_OPCAO_TRI_HORARIA"></span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row section" id="section-4">
+    <div class="col-md-8 col-xs-10 text40 question" data-translate="ELE_PERGUNTA_4"></div>
+    <div class="col-md-4 col-xs-2 infoParent">
+        <i class="icon-24" onclick=""></i>
+        <div class="info" data-translate="ELE_BALAO_4"></div>
+    </div>
+    <div class="col-md-8 col-xs-12">
+        <div class="row options">
+            <div class="col-xs-1 hidden-sm hidden-md hidden-lg">&nbsp;</div>
+            <div class="col-sm-3 col-xs-5 col-xs">
+                <input type="radio" id="electCalendar1" name="electCalendar" value="0" data-val="1 Mês" />
+                <label class="ll" for="electCalendar1">
+                    <div class='square-box'>
+                        <div class="tick-wrapper"></div>
+                        <span class="tick"></span>
+                        <div class='square-content'>
+                            <div>
+                                <div class="calendarIcon">
+                                    <div class="calendarHeader"></div>
+                                    <p>1</p>
+                                    <p data-translate="GERAL_OPCAO_MES"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </label>
+            </div>
+            <div class="col-sm-3 col-xs-5 col-xs">
+                <input type="radio" id="electCalendar2" name="electCalendar" value="1" data-val="2 Meses" />
+                <label class="ll" for="electCalendar2">
+                    <div class='square-box'>
+                        <div class="tick-wrapper"></div>
+                        <span class="tick"></span>
+                        <div class='square-content'>
+                            <div>
+
+                                <div class="calendarIcon">
+                                    <div class="calendarHeader"></div>
+                                    <p>2</p>
+                                    <p data-translate="GERAL_OPCAO_MESES"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </label>
+            </div>
+            <div class="col-xs-1 hidden-sm hidden-md hidden-lg">&nbsp;</div>
+            <div class="col-xs-1 hidden-sm hidden-md hidden-lg clear">&nbsp;</div>
+            <div class="col-sm-3 col-xs-5 col-xs">
+                <input type="radio" id="electCalendar3" name="electCalendar" value="2" data-val="12 Meses" />
+                <label class="ll" for="electCalendar3">
+                    <div class='square-box'>
+                        <div class="tick-wrapper"></div>
+                        <span class="tick"></span>
+                        <div class='square-content'>
+                            <div class="calendarIcon">
+                                <div class="calendarHeader"></div>
+                                <p>12</p>
+                                <p data-translate="GERAL_OPCAO_MESES"></p>
+                            </div>
+                        </div>
+                    </div>
+                </label>
+            </div>
+            <div class="col-sm-3 col-xs-5 col-xs">
+                <input type="radio" id="electCalendar4" name="electCalendar" value="3" />
+                <label class="ll showCalendar" for="electCalendar4">
+                    <div class='square-box'>
+                        <div class="tick-wrapper"></div>
+                        <span class="tick"></span>
+                        <div class='square-content'>
+                            <div>
+                                <div class="calendarIcon">
+                                    <div class="calendarHeader"></div>
+                                    <p>?</p>
+                                    <p data-translate="GERAL_OPCAO_A_DEFINIR"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </label>
+            </div>
+            <div class="col-xs-1 hidden-sm hidden-md hidden-lg">&nbsp;</div>
+            <div class="Calendars">
+                <div class="col-md-5 col-sm-6 col-xs-12">
+                    <div class="text24" data-translate="GERAL_OPCAO_INICIO_DATA"></div>
+                    <div id="datepicker1"></div>
+                </div>
+                <div class="col-md-5 col-sm-6 col-xs-12">
+                    <div class="text24" data-translate="GERAL_OPCAO_FIM_DATA"></div>
+                    <div id="datepicker2"></div>
+                </div>
+                <div class="col-md-12 col-sm-12 col-xs-12 text-left">
+                    <input type="hidden" id="electCalendarPeriodStart" name="electCalendarPeriodStart" />
+                    <input type="hidden" id="electCalendarPeriodEnd" name="electCalendarPeriodEnd" />
+                    <span data-translate="GERAL_OPCAO_TOTAL"></span>: <span id="days1"></span> <span data-translate="GERAL_OPCAO_DIAS"></span>
+                    <div class="row text-center">
+                         <div class="spacer"></div>
+                         <div class="spacer"></div>
+                         <div class="spacer"></div>
+                    	 <button class="scroll-bt text36 box" data-translate="GERAL_NEXT" style="padding:5px 75px;"></button>  
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row section" id="section-5">
+    <div class="col-md-8 col-xs-10 text40 question" data-translate="ELE_PERGUNTA_5"></div>
+    <div class="col-md-4 col-xs-2 infoParent">
+        <i class="icon-24" onclick=""></i>
+        <div class="info" data-translate="ELE_BALAO_5"></div>
+    </div>
+    <div class="col-md-8 col-xs-12">
+        <div class="row options ponta">
+            <div class="col-md-3 col-xs-4">
+                <input type="number" name="electPonta" step="0.0001" />
+            </div>
+            <div class="col-md-8 col-xs-8 nopadding text24 top-space">
+                <span class="electPontaLabel1" data-translate="ELE_OPCAO_CONSUMO_1H"></span>
+                <span class="electPontaLabel2" data-translate="ELE_OPCAO_CONSUMO_2H_FV"></span>
+                <span class="electPontaLabel3" data-translate="ELE_OPCAO_CONSUMO_3H-P"></span>
+                <div class="infoApply">* Valor não aplicável</div>
+            </div>
+        </div>
+        <div class="row options cheias">
+            <div class="col-md-3 col-xs-4">
+                <input type="number" name="electCheias" step="0.0001" />
+            </div>
+            <div class="col-md-6 col-xs-6 nopadding text24 top-space">
+              	<span class="electCheiasLabel1" data-translate="ELE_OPCAO_CONSUMO_2H_V"></span>
+                <span class="electCheiasLabel2" data-translate="ELE_OPCAO_CONSUMO_3H-C"></span>
+            </div>
+        </div>
+        <div class="row options vazio">
+            <div class="col-md-3 col-xs-4">
+                <input type="number" name="electVazio" step="0.0001" />
+            </div>
+            <div class="col-md-6 col-xs-6 nopadding text24 top-space">
+                <span class="electVazioLabel1" data-translate="ELE_OPCAO_CONSUMO_3H-V"></span>
+            </div>
+        </div>
+        <div class="row text-center">
+             <div class="spacer"></div>
+             <div class="spacer"></div>
+             <div class="spacer"></div>
+             <button class="scroll-bt text36 box" data-translate="GERAL_NEXT" style="padding:5px 75px;"></button>
+        </div>
+    </div>
+</div>
+
+<div class="row section" id="section-6">
+    <div class="col-md-8 col-xs-10 text40 question" data-translate="ELE_PERGUNTA_6"></div>
+    <div class="col-md-4 col-xs-2 infoParent">
+        <i class="icon-24" onclick=""></i>
+        <div class="info" data-translate="ELE_BALAO_6"></div>
+    </div>
+    <div class="col-md-8 col-xs-12">
+        <div class="row options options2">
+            <div class="col-md-3 col-xs-6">
+                <input type="radio" id="showElectPrice1" name="showElectPrice" value="true" />
+                <label for="showElectPrice1">
+                    <div class="tick-wrapper tick-bi"></div>
+                    <span class="tick tick-bi"></span>
+                    <span class="text30 pad-10" data-translate="GERAL_OPCAO_SIM"></span>
+                </label>
+            </div>
+            <div class="col-md-3 col-xs-6">
+                <input type="radio" id="showElectPrice2" name="showElectPrice" value="false" />
+                <label for="showElectPrice2">
+                    <div class="tick-wrapper tick-bi"></div>
+                    <span class="tick tick-bi"></span>
+                    <span class="text30 pad-10" data-translate="GERAL_OPCAO_NAO"></span>
+                </label>
+            </div>
+        </div>
+        <div class="spacer"></div>
+        <div class="spacer"></div>
+        <div class="spacer"></div>
+        <div class="spacer"></div>
+        <div class="spacer"></div>
+        <div class="spacer"></div>
+    </div>
+</div>
+
+<div class="row section prices" id="section-7">
+    <div class="col-md-8 col-xs-10 text40 question" data-translate="ELE_PERGUNTA_7"></div>
+    <div class="col-md-4 col-xs-2 infoParent">
+        <i class="icon-24" onclick=""></i>
+        <div class="info" data-translate="ELE_BALAO_7"></div>
+    </div>
+    <div class="col-md-8 col-xs-12">
+        <div class="row options top-space ponta">
+            <div class="col-md-3 col-xs-4">
+         		<input type="number" name="electFaturaPonta" step="0.0001" />
+            </div>
+            <div class="col-md-6 col-xs-6 nopadding text24 top-space">
+               	<span class="electFaturaPontaLabel1" data-translate="ELE_OPCAO_PRECO_1H"></span>
+                <span class="electFaturaPontaLabel2" data-translate="ELE_OPCAO_PRECO_2H_FV"></span>
+                <span class="electFaturaPontaLabel3" data-translate="ELE_OPCAO_PRECO_3H-P"></span>
+            </div>
+        </div>
+        <div class="row options cheias">
+            <div class="col-md-3 col-xs-4">
+            	<input type="number" name="electFaturaCheias" step="0.0001" />
+            </div>
+            <div class="col-md-6 col-xs-6 nopadding text24 top-space">
+                <span class="electFaturaCheiasLabel1" data-translate="ELE_OPCAO_PRECO_2H_V"></span>
+                <span class="electFaturaCheiasLabel2" data-translate="ELE_OPCAO_PRECO_3H-C"></span>
+            </div>
+        </div>
+        <div class="row options vazio">
+            <div class="col-md-3 col-xs-4">
+            	<input type="number" name="electFaturaVazio" step="0.0001" />
+            </div>
+            <div class="col-md-6 col-xs-6 nopadding text24 top-space">
+                <span class="electFaturaVazioLabel" data-translate="ELE_OPCAO_PRECO_3H-V"></span>
+            </div>
+        </div>
+        <div class="row options">
+            <div class="col-md-3 col-xs-4">
+            	<input type="number" name="electFaturaFixo" />
+            </div>
+            <div class="col-md-6 col-xs-6 nopadding text24 top-space">
+                <span data-translate="ELE_OPCAO_PRECO_TF" step="0.0001"></span>
+            </div>
+        </div>
+        <div class="row text-center">
+             <div class="spacer"></div>
+             <div class="spacer"></div>
+             <div class="spacer"></div>
+             <button class="last-bt scroll-bt text36 box" data-translate="GERAL_NEXT" style="padding:5px 75px;"></button>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+  			<div class="row conclude text-center">
+            <button id="simulate" class="col-sm-4 text36 box conclude" data-translate="GERAL_SIMULAR"></button>
+  			<img id="loader" src="https://bdn.scriptorserver.com/scriptor/bundles/8ba7498c5160579e836aa5cff75c98ef/fcae7115-206d-46b7-8c5e-01b6b7869728/images/loader.svg"/>
+  			<div id="err-results" style="display:none"></div>
+        </div>
+        <div class="spacer"></div>
+        <div class="spacer"></div>
+        <div class="spacer"></div>
+  
+  
+  
+  
+
+
+  
+  			</div>
+  		</div>
+    </form>
+    
+<div id="results" class="row white">
+    <div class="container">
+        
+
+        <div id="resume-container2"></div>
+        <div id="resume-container"></div>
+
+
+        <div class="row top-spacer">
+            <div class="col-sm-3 hidden-print" id="left" style="padding-left:0;">
+                <div class="filter-name filter-name-on" data-translate="OUT_FILT_TITULO"></div>
+                <div class="filter-wrapper">
+                    <div class="filter-line">
+                        <input type="checkbox" class="data-simulate checkbox" data-col="SemRevisaoPrecos" id="f5" data-title="OUT_FILT_INDEX_INFO" checked="checked" />
+                        <label for="f5">
+                            <i class="icon icon-13 medium" data-title="OUT_FILT_INDEX_INFO"></i>
+                            <span data-translate="OUT_FILT_INDEX" data-title="OUT_FILT_INDEX_INFO"></span>
+                        </label>
+                    </div>
+                    <div class="filter-line">
+                        <input type="checkbox" class="data-simulate checkbox" data-col="SemRestricoesAdicionais" id="f4" data-title="OUT_FILT_RESTRICOES_INFO" checked="checked" />
+                        <label for="f4">
+                            <i class="icon icon-16 medium" data-title="OUT_FILT_RESTRICOES_INFO"></i>
+                            <span data-translate="OUT_FILT_RESTRICOES" data-title="OUT_FILT_RESTRICOES_INFO"></span>
+                        </label>
+                    </div>
+
+                    <div class="filter-line">
+                        <input type="checkbox" class="data-simulate checkbox" data-col="SemFidelizacao" id="f8" data-title="OUT_FILT_FIDELIZACAO_INFO" checked="checked" />
+                        <label for="f8">
+                            <i class="icon icon-18 medium" data-title="OUT_FILT_FIDELIZACAO_INFO"></i>
+                            <span data-translate="OUT_FILT_FIDELIZACAO" data-title="OUT_FILT_FIDELIZACAO_INFO"></span>
+                        </label>
+                    </div>
+
+                    
+
+                    <div class="filter-line" id="NovosClientes">
+                        <input type="checkbox" class="data-simulate checkbox" data-col="NovosClientes" id="f10" data-title="OUT_FILT_NOVOS_CLIENTES_INFO" checked="checked" />
+                        <label for="f10">
+                            <i class="icon icon-40-nc medium" data-title="OUT_FILT_NOVOS_CLIENTES_INFO"></i>
+                            <span data-translate="OUT_FILT_NOVOS_CLIENTES" data-title="OUT_FILT_NOVOS_CLIENTES_INFO"></span>
+                        </label>
+                    </div>
+
+                    <div class="filter-line">
+                        <input type="checkbox" class="data-simulate checkbox" data-col="SemDescontoCondicionado" id="f6" data-title="OUT_FILT_REEMBOLSO_INFO" checked="checked" />
+                        <label for="f6">
+                            <i class="icon icon-17 medium" data-title="OUT_FILT_REEMBOLSO_INFO"></i>
+                            <span data-translate="OUT_FILT_REEMBOLSO" data-title="OUT_FILT_REEMBOLSO_INFO"></span>
+                        </label>
+                    </div>
+
+                    <div class="filter-line" id="Energia100Verde">
+                        <input type="checkbox" class="data-simulate checkbox" data-col="Energia100Verde" id="f7" data-title="OUT_FILT_VERDE_INFO" />
+                        <label for="f7">
+                            <i class="icon icon-15 medium" data-title="OUT_FILT_VERDE_INFO"></i>
+                            <span data-translate="OUT_FILT_VERDE" data-title="OUT_FILT_VERDE_INFO"></span>
+                        </label>
+                    </div>
+                    <div class="filter-line" id="Gas100Verde">
+                        <input type="checkbox" class="data-simulate checkbox" data-col="Gas100Verde" id="f11" data-title="OUT_FILT_GAS_VERDE_INFO" />
+                        <label for="f11">
+                            <i class="icon icon-green-gas medium" data-title="OUT_FILT_VERDE_INFO"></i>
+                            <span data-translate="OUT_FILT_GAS_VERDE" data-title="OUT_FILT_GAS_VERDE_INFO"></span>
+                        </label>
+                    </div>
+
+                    <div class="filter-line">
+                        <input type="checkbox" class="data-simulate checkbox" data-col="AssistenciaTecnica" id="f3" data-title="OUT_FILT_SERVICOS_INFO" />
+                        <label for="f3">
+                            <i class="icon icon-12 medium" data-title="OUT_FILT_SERVICOS_INFO"></i>
+                            <span data-translate="OUT_FILT_SERVICOS" data-title="OUT_FILT_SERVICOS_INFO"></span>
+                        </label>
+                    </div>
+
+                    <div class="filter-line" id="FamiliasNumerosas">
+                        <input type="checkbox" class="data-simulate checkbox" data-col="FamiliasNumerosas" id="f9" data-title="OUT_FILT_FAMILIAS_NUMEROSAS_INFO" />
+                        <label for="f9">
+                            <i class="icon icon-37-fn medium" data-title="OUT_FILT_FAMILIAS_NUMEROSAS_INFO"></i>
+                            <span data-translate="OUT_FILT_FAMILIAS_NUMEROSAS" data-title="OUT_FILT_FAMILIAS_NUMEROSAS_INFO"></span>
+                        </label>
+                    </div>
+
+                    <div class="filter-line">
+                        <input type="checkbox" class="data-simulate checkbox" data-col="TarifaSocial" id="f1" data-title="OUT_FILT_TSOCIAL_INFO"  />
+                        <label for="f1">
+                            <i class="icon icon-20 medium" data-title="OUT_FILT_TSOCIAL_INFO"></i>
+                            <span data-translate="OUT_FILT_TSOCIAL" data-title="OUT_FILT_TSOCIAL_INFO"></span>
+                        </label>
+                    </div>
+
+
+                    <div class="filter-line radios hidden">
+                        <div data-translate="OUT_FILT_SEGMENTO"></div>
+                        
+                        <div><input type="radio" name="Segment" id="Segment2" value="1" class="checkbox"><label for="Segment2" data-translate="OUT_FILT_SEGMENTO_DOM"></label></div>
+                        <div><input type="radio" name="Segment" id="Segment3" value="2" class="checkbox"><label for="Segment3" data-translate="OUT_FILT_SEGMENTO_NDOM"></label></div>
+                    </div>
+
+                    <div class="filter-line radios hidden">
+                        <div data-translate="OUT_FILT_CONTRAT"></div>
+                        <div><input type="radio" name="Contract" id="Contract1" value="1" class="checkbox" checked><label for="Contract1" data-translate="OUT_FILT_QUALQUER"></label></div>
+                        <div><input type="radio" name="Contract" id="Contract2" value="2" class="checkbox"><label for="Contract2" data-translate="OUT_FILT_CONTRAT_ELET"></label></div>
+                        <div><input type="radio" name="Contract" id="Contract3" value="3" class="checkbox"><label for="Contract3" data-translate="OUT_FILT_CONTRAT_TELEF"></label></div>
+                        <div><input type="radio" name="Contract" id="Contract4" value="4" class="checkbox"><label for="Contract4" data-translate="OUT_FILT_CONTRAT_PRESENC"></label></div>
+                    </div>
+
+                    <div class="filter-line radios hidden">
+                        <div data-translate="OUT_FILT_FATURA"></div>
+                        <div><input type="radio" name="Invoice" id="Invoice1" value="1" class="checkbox" checked><label for="Invoice1" data-translate="OUT_FILT_QUALQUER"></label></div>
+                        <div><input type="radio" name="Invoice" id="Invoice2" value="2" class="checkbox"><label for="Invoice2" data-translate="OUT_FILT_FATURA_ELET"></label></div>
+                        <div><input type="radio" name="Invoice" id="Invoice3" value="3" class="checkbox"><label for="Invoice3" data-translate="OUT_FILT_FATURA_PAPEL"></label></div>
+                    </div>
+
+                    <div class="filter-line radios hidden">
+                        <div data-translate="OUT_FILT_PAGAMENTO"></div>
+                        <div><input type="radio" name="PayMethod" id="PayMethod1" value="1" class="checkbox" checked><label for="PayMethod1" data-translate="OUT_FILT_QUALQUER"></label></div>
+                        <div><input type="radio" name="PayMethod" id="PayMethod2" value="2" class="checkbox"><label for="PayMethod2" data-translate="OUT_FILT_PAGAMENTO_DD"></label></div>
+                        <div><input type="radio" name="PayMethod" id="PayMethod3" value="3" class="checkbox"><label for="PayMethod3" data-translate="OUT_FILT_PAGAMENTO_MB"></label></div>
+                        <div>
+                            <input type="radio" name="PayMethod" id="PayMethod4" value="4" class="checkbox"><label for="PayMethod4" data-translate="OUT_FILT_PAGAMENTO_OUTROS"></label>
+                        </div>
+                    </div>
+
+                    <div class="filter-line radios hidden">
+                        <div data-translate="OUT_FILT_VALOR_ANO"></div>
+                        <div><input type="radio" name="Payment" id="Payment1" value="anual" class="checkbox" checked><label for="Payment1" data-translate="OUT_FILT_VALOR_ANO"></label></div>
+                        <div><input type="radio" name="Payment" id="Payment2" value="mensal" class="checkbox"><label for="Payment2" data-translate="OUT_FILT_VALOR_MÊS"></label></div>
+                    </div>
+
+                </div>
+                <div class="spacer"></div>
+                <div class="filter-name filter-name-off"><span data-translate="OUT_COM_TITULO"></span> (<span id="n_comercializadores"></span>)</div>
+                <div id="comercializadores" class="filter-wrapper">
+
+                </div>
+                <div class="spacer"></div>
+                
+                <form class="filter-wrapper" id="simulation-2"></form>
+
+            </div>
+            <div class="col-sm-9 no-padding print-margin">
+                <div class="row hidden-print">
+                    <div class="col-md-5 col-xs-12" style="padding-right:0;">
+                        <div class="resumo">
+                            <span data-translate="OUT_LIST_TITULO"></span> <span class="num-results"></span>
+                            <span class="clear-filters">X <span data-translate="OUT_FILT_REMOVER"></span></span>
+                        </div>
+                    </div>
+                    <div class="col-md-7 col-xs-12 text-right text-left-xs" style="margin-top:8px;">
+                        <input type="checkbox" class="cb-small" id="single-supplier" />
+                        <label for="single-supplier" class="default-color" data-translate="OUT_FILT_DUAL_1COMERCIAL"></label>
+                    </div>
+
+                    <div class="col-md-10" id="filters">
+                        <div class="inline">
+                            <div style="color: #585960; font-weight: bold; font-size: .85em;margin-right: 10px;text-align: center;" data-translate="OUT_FILT_SEGMENTO"></div>
+                            <dropdown class="filter list-unstyled" data-col="Segmento">
+                                <input id="toggle1" type="checkbox">
+                                <label for="toggle1" class="animate"><span class="dropTitle" data-translate="OUT_FILT_SEGMENTO"></span><span class="caret"></span></label>
+                                <ul class="animate">
+                                    
+                                    <li class="animate" value="1" data-translate="OUT_FILT_SEGMENTO_DOM"></li>
+                                    <li class="animate" value="2" data-translate="OUT_FILT_SEGMENTO_NDOM"></li>
+                                </ul>
+                            </dropdown>
+                        </div>
+
+                        <!--div class="inline">
+                            <div style="color: #585960; font-weight: bold; font-size: .85em;margin-right: 10px;text-align: center;" data-translate="OUT_FILT_TIPO_PRECO"></div>
+                            <dropdown class="filter list-unstyled" data-col="TipoPreco">
+                                <input id="toggle6" type="checkbox">
+                                <label for="toggle6" class="animate"><span class="dropTitle" data-translate="OUT_FILT_TIPO_PRECO_QUALQUER"></span><span class="caret"></span></label>
+                                <ul class="animate">
+                                    <li class="animate" value="1" data-translate="OUT_FILT_TIPO_PRECO_QUALQUER"></li>
+                                    <li class="animate" value="2" data-translate="OUT_FILT_TIPO_PRECO_PRECOS_INDEXADOS"></li>
+                                    <li class="animate" value="3" data-translate="OUT_FILT_TIPO_PRECO_PRECOS_FIXOS"></li>
+                                </ul>
+                            </dropdown>
+                        </div-->
+
+                        <div class="inline">
+                            <div style="color: #585960; font-weight: bold; font-size: .85em;margin-right: 10px;text-align: center;" data-translate="OUT_FILT_TIPO_PRECO_ELE"></div>
+                            <dropdown class="filter list-unstyled" data-col="TipoPrecoEle">
+                                <input id="toggle7" type="checkbox">
+                                <label for="toggle7" class="animate"><span class="dropTitle" data-translate="OUT_FILT_TIPO_PRECO_QUALQUER"></span><span class="caret"></span></label>
+                                <ul class="animate">
+                                    <li class="animate" value="1" data-translate="OUT_FILT_TIPO_PRECO_QUALQUER"></li>
+                                    <li class="animate" value="2" data-translate="OUT_FILT_TIPO_PRECO_PRECOS_INDEXADOS"></li>
+                                    <li class="animate" value="3" data-translate="OUT_FILT_TIPO_PRECO_PRECOS_FIXOS"></li>
+                                </ul>
+                            </dropdown>
+                        </div>
+                        <div class="inline">
+                            <div style="color: #585960; font-weight: bold; font-size: .85em;margin-right: 10px;text-align: center;" data-translate="OUT_FILT_TIPO_PRECO_GAS"></div>
+                            <dropdown class="filter list-unstyled" data-col="TipoPrecoGas">
+                                <input id="toggle8" type="checkbox">
+                                <label for="toggle8" class="animate"><span class="dropTitle" data-translate="OUT_FILT_TIPO_PRECO_QUALQUER"></span><span class="caret"></span></label>
+                                <ul class="animate">
+                                    <li class="animate" value="1" data-translate="OUT_FILT_TIPO_PRECO_QUALQUER"></li>
+                                    <li class="animate" value="2" data-translate="OUT_FILT_TIPO_PRECO_PRECOS_INDEXADOS"></li>
+                                    <li class="animate" value="3" data-translate="OUT_FILT_TIPO_PRECO_PRECOS_FIXOS"></li>
+                                </ul>
+                            </dropdown>
+                        </div>
+
+
+                        <div class="inline">
+                            <div style="color: #585960; font-weight: bold; font-size: .85em;margin-right: 10px;text-align: center;" data-translate="OUT_FILT_CONTRAT"></div>
+                            <dropdown class="filter list-unstyled" data-col="Contratacao">
+                                <input id="toggle2" type="checkbox">
+                                <label for="toggle2" class="animate"><span class="dropTitle" data-translate="OUT_FILT_QUALQUER"></span><span class="caret"></span></label>
+                                <ul class="animate">
+                                    <li class="animate" value="1" data-translate="OUT_FILT_QUALQUER"></li>
+                                    <li class="animate" value="2" data-translate="OUT_FILT_CONTRAT_ELET"></li>
+                                    <li class="animate" value="3" data-translate="OUT_FILT_CONTRAT_TELEF"></li>
+                                    <li class="animate" value="4" data-translate="OUT_FILT_CONTRAT_PRESENC"></li>
+                                </ul>
+                            </dropdown>
+                        </div>
+                        <div class="inline">
+                            <div style="color: #585960; font-weight: bold; font-size: .85em;margin-right: 10px;text-align: center;" data-translate="OUT_FILT_FATURA"></div>
+                            <dropdown class="filter list-unstyled" data-col="Faturacao">
+                                <input id="toggle3" type="checkbox">
+                                <label for="toggle3" class="animate"><span class="dropTitle" data-translate="OUT_FILT_QUALQUER"></span><span class="caret"></span></label>
+                                <ul class="animate">
+                                    <li class="animate" value="1" data-translate="OUT_FILT_QUALQUER"></li>
+                                    <li class="animate" value="2" data-translate="OUT_FILT_FATURA_ELET"></li>
+                                    <li class="animate" value="3" data-translate="OUT_FILT_FATURA_PAPEL"></li>
+                                </ul>
+                            </dropdown>
+                        </div>
+                        <div class="inline">
+                            <div style="color: #585960; font-weight: bold; font-size: .85em;margin-right: 10px;text-align: center;" data-translate="OUT_FILT_PAGAMENTO"></div>
+                            <dropdown class="filter list-unstyled" data-col="Pagamento">
+                                <input id="toggle4" type="checkbox">
+                                <label for="toggle4" class="animate"><span class="dropTitle" data-translate="OUT_FILT_QUALQUER"></span><span class="caret"></span></label>
+                                <ul class="animate">
+                                    <li class="animate" value="1" data-translate="OUT_FILT_QUALQUER"></li>
+                                    <li class="animate" value="2"><span data-translate="OUT_FILT_PAGAMENTO_DD"></span></li>
+                                    <li class="animate" value="3"><span data-translate="OUT_FILT_PAGAMENTO_MB"></span></li>
+                                    <li class="animate" value="4"><span data-translate="OUT_FILT_PAGAMENTO_OUTROS"></span></li>
+                                </ul>
+                            </dropdown>
+                        </div>
+                        <div class="inline">
+                            <div style="color: #585960; font-weight: bold; font-size: .85em;margin-right: 10px;text-align: center;" data-translate="OUT_FILT_VALOR_ANO_LABEL"></div>
+                            <dropdown class="price-unit list-unstyled" data-col="Valor">
+                                <input id="toggle5" type="checkbox">
+                                <label for="toggle5" class="animate"><span class="dropTitle" data-translate="OUT_FILT_VALOR_ANO"></span><span class="caret"></span></label>
+                                <ul class="animate">
+                                    <li class="animate" value="anual" data-translate="OUT_FILT_VALOR_ANO"></li>
+                                    <li class="animate" value="mensal" data-translate="OUT_FILT_VALOR_MÊS"></li>
+                                </ul>
+                            </dropdown>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-xs-12 text-right">
+                        <button class="compare" data-translate="OUT_FILT_COMPARAR">Comparar <span id="compare-num"></span></button>
+                        <div class="comp-feedback"></div>
+                    </div>
+                </div>
+                <div class="spacer"></div>
+                <div id="offer-results" class="row">
+
+                </div>
+
+                <div class="row">
+                    <div class="col-xs-12 text-center pagination hidden-print">
+
+                    </div>
+                </div>
+                <div class="spacer"></div>
+                <div class="row hidden-print">
+                    <div class="col-xs-12">
+                        <div class="obs def-color" data-translate="OUT_DISCLAIM_TITULO"></div>
+                        <div class="obs top-space" data-translate="OUT_DISCLAIM_ELE">
+                        </div>
+                    </div>
+                    <div class="col-xs-12 top-spacer text-right text-center-xs">
+                        <a href="#" class="obs def-color externalLink" target="_blank"><span class="icon micro inline def-color icon-download"></span> <span data-translate="HOME_LINK_PDF_LABEL"></span></a>
+                    </div>
+                </div>
+                <div class="spacer"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="comparer" class="row comparer">
+    <div class="container inner-comparer">
+        <div class="turn-device">
+            Please, rotate your device for a better viewing of the results
+        </div>
+        <table class="comparer-table"></table>
+    </div>
+</div>
+
+<div id="dialog-form" style="display:none" class="contact-form" title="Reportar preços/informação diferente da fornecida pelo comercializador">
+    <p class="validateTips" data-translate="FORM_LEAD">Diga-nos que diferenças encontrou entre este simulador e o comercializador. Este preenchimento não serve como reclamação.</p>
+    <iframe height="0" width="0" id="formTarget" name="formTarget" style="display: none; visibility: hidden;" src="about:blank"></iframe>
+    <form data-action="/formulario" id="contactForm" method="post" enctype="multipart/form-data" action="/formulario" name="contactForm" target="formTarget">
+        <input data-optional="True" id="Channel" name="Channel" type="hidden" value="4C9D0F86-EF4D-4937-AF12-D54AA3F075DC">
+        <input id="nome_do_comercializador" name="nome_do_comercializador" type="hidden" />
+        <input id="nome_oferta_comercial" name="nome_oferta_comercial" type="hidden" />
+        <input id="data" name="data" type="hidden" />
+        <fieldset>
+            <label for="name" data-translate="FORM_PRECOS">Os seus preços</label>
+            <textarea name="precos" id="precos" value="" class="text ui-widget-content ui-corner-all w100 price-report-text"></textarea>
+            <label for="email" data-translate="FORM_COMENTARIOS">Comentários</label>
+            <textarea name="comentarios" id="comentarios" value="" class="text ui-widget-content ui-corner-all price-report-text"></textarea>
+
+            <label for="email" data-translate="FORM_FICHEIRO">Anexar ficheiro</label>
+            <input type="file" name="anexo" id="anexo" value="" class="text ui-widget-content ui-corner-all price-report-file" />
+
+            <input type="submit" tabindex="-1" style="position:absolute; top:-1000px" />
+        </fieldset>
+    </form>
+</div>
+
+
+<script type="text/javascript">
+
+    var formData = {};
+    $(document).ready(function () {
+
+        formData = {
+        };
+
+        if (Object.keys(formData).length > 0) {
+            for (var key in formData) {
+                if (formData.hasOwnProperty(key)) {
+                    var value = formData[key];
+
+                    // Find all form elements with matching name
+                    var elements = document.getElementsByName(key);
+
+                    for (var i = 0; i < elements.length; i++) {
+                        var element = elements[i];
+                        var tagName = element.tagName.toLowerCase();
+                        var type = element.type ? element.type.toLowerCase() : '';
+
+                        if (tagName === 'input') {
+                            if (type === 'checkbox' || type === 'radio') {
+                                element.checked = (element.value === value);
+                            } else {
+                                element.value = value;
+                            }
+                        } else if (tagName === 'select' || tagName === 'textarea') {
+                            element.value = value;
+                        }
+                    }
+                }
+            }
+
+
+            if (formData.codPostal) {
+                $('.codPostalSelect').val(formData.codPostal);
+            }
+            if (formData.gasCaseType && !formData.caseType) {
+                $('input[name="caseType"][value="' + formData.gasCaseType + '"]').prop('checked', true);
+            }
+            if (formData.electTarifaSocial == "1" || formData.gasTarifaSocial == "1") {
+                $('#f1').attr("checked", "checked");
+            }
+
+            $("#simulate").click();
+
+            /*var APIUrl = 'https://qualsimuladorprecos.erse.pt/api/public';*/
+            var APIUrl = 'https://qualsimuladorprecos.erse.pt/api2/proxy';
+     		let currentJobId = formData.currentJobId;
+            let rating = formData.rating;
+
+            if (currentJobId && rating){
+
+             fetch(`${APIUrl}/review/${currentJobId}`, {
+                method: 'POST',
+                headers: {
+                  "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: new URLSearchParams({ rating: rating }).toString()
+              })
+				.then(response => {
+                     if (!response.ok) {
+                         throw new Error('Network response was not ok');
+                     }
+                     return response.json();
+                 })
+                 .then(data => {
+                     //console.log('Review submitted:', data);
+                 })
+                 .catch(error => {
+                     console.error('There was a problem with the fetch operation:', error);
+                 });
+         	}
+        }
+    });
+
+</script>
+
+
+
+  	
+</div>
+</form>
+
+
+
+<!-- container-fluid -->
+<!--FOOTER -->
+<footer>
+    <div class="container">
+        <div class="col-xs-12 col-sm-4 rights" data-translate="FOOTER"></div>
+        	<div class="col-xs-12 col-sm-4"><a href="/privacy/" data-translate="FOOTER_PRIVACY">Privacy</a></div>
+        <div class="col-xs-12 col-sm-4"><span class="powered">Powered by </span><img class="logoVT" src="https://simuladorpotencia.erse.pt/static/share/2026-01/2932bd51-18a3-4c09-ac91-dd5c676af085/61c95db7-8cba-40be-9cf1-b523355f6b3c/logo_footer/cd77123f-8519-4bea-8ad4-2d6ca1d16a40/20260115181408/logo_vt.png" /> <img class="logoVT logoVTNeg hidden" src="https://simuladorpotencia.erse.pt/static/share/2026-01/2932bd51-18a3-4c09-ac91-dd5c676af085/61c95db7-8cba-40be-9cf1-b523355f6b3c/logo_footer_negative/cd77123f-8519-4bea-8ad4-2d6ca1d16a40/20260115181408/logo_vt-Neg.png" /></div>
+    </div>
+</footer>
+<!--FOOTER -->
+
+
+
+    
+
+    
+                                       
+    
+
+    
+
+
+    
+</body>
+</html>
+<!--CHANGE LAYOUT :~/Views/Shared/_Layout.cshtml-->
+<!--CHANGE LAYOUT :~/Views/Templates/layout.e355ee41-89b5-4a38-af62-6c7fa575934c.40.-388232095.pt-PT.cshtml-->
