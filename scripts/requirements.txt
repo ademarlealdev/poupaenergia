@@ -1,0 +1,5 @@
+pyerse
+python-dotenv
+requests
+flask
+flask-cors

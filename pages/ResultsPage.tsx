@@ -77,7 +77,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ data: initialData }) => {
               {isEditing ? 'Cancelar' : 'Ajustar Consumo'}
             </button>
             <button
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/upload')}
               className="bg-secondary text-white px-6 py-3 rounded-xl font-bold text-sm hover:opacity-90 transition-all"
             >
               Nova análise
@@ -113,7 +113,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ data: initialData }) => {
               <div className="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center font-bold text-primary">€</div>
               <div>
                 <p className="text-gray-400 text-[10px] uppercase font-bold tracking-widest">O seu Fornecedor</p>
-                <p className="font-bold text-secondary">{data.fornecedorAtual}</p>
+                <p className="font-bold text-secondary capitalize">{data.fornecedorAtual}</p>
               </div>
             </div>
             <div className="h-px md:h-8 w-full md:w-px bg-gray-200"></div>
@@ -147,8 +147,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ data: initialData }) => {
                 <div className="flex items-center gap-4 mb-6">
                   {bestOption.provider.logo && <img src={bestOption.provider.logo} alt={bestOption.provider.nome} className="w-16 h-16 rounded-2xl shadow-sm border border-gray-100" />}
                   <div>
-                    <h2 className="text-2xl font-bold text-secondary">{bestOption.provider.nome}</h2>
-                    <p className="text-primary font-semibold">{bestOption.provider.precoKwh.toFixed(3)} €/kWh</p>
+                    <h2 className="text-2xl font-bold text-secondary capitalize">{bestOption.provider.nome}</h2>
+                    <p className="text-primary font-semibold">{bestOption.provider.precoKwh} €/kWh</p>
                   </div>
                 </div>
 
@@ -199,6 +199,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ data: initialData }) => {
               <th className="px-8 py-5">Fornecedor</th>
               <th className="px-8 py-5">Preço kWh</th>
               <th className="px-8 py-5">Custo Anual</th>
+              <th className="px-8 py-5">Poupança Mensal</th>
               <th className="px-8 py-5">Poupança Anual</th>
               <th className="px-8 py-5 text-right">Acção</th>
             </tr>
@@ -208,17 +209,37 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ data: initialData }) => {
               <tr key={idx} className={idx === 0 ? 'bg-primary/5' : ''}>
                 <td className="px-8 py-6">
                   <div className="flex items-center gap-3">
-                    {res.provider.logo && <img src={res.provider.logo} alt="" className="w-8 h-8 rounded-lg" />}
-                    <span className="font-bold text-secondary">{res.provider.nome}</span>
+                    {res.provider.logo ? (
+                      <img
+                        src={res.provider.logo}
+                        alt={res.provider.nome}
+                        className="w-10 h-10 rounded-xl object-contain bg-white border border-gray-100 p-1"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                        }}
+                      />
+                    ) : null}
+                    <div className={`w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center text-gray-400 font-bold ${res.provider.logo ? 'hidden' : ''}`}>
+                      {res.provider.nome.charAt(0)}
+                    </div>
+                    <span className="font-bold text-secondary capitalize">{res.provider.nome}</span>
                   </div>
                 </td>
-                <td className="px-8 py-6 text-gray-500 font-medium">{res.provider.precoKwh.toFixed(3)}€</td>
+                <td className="px-8 py-6 text-gray-500 font-medium">{res.provider.precoKwh}€</td>
                 <td className="px-8 py-6 font-bold text-secondary">{res.annualCost.toFixed(2)}€</td>
+                <td className="px-8 py-6">
+                  {res.monthlySaving > 0 ? (
+                    <span className="text-primary font-bold">-{res.monthlySaving.toFixed(2)}€</span>
+                  ) : (
+                    <span className="text-red-500 font-bold">+{Math.abs(res.monthlySaving).toFixed(2)}€</span>
+                  )}
+                </td>
                 <td className="px-8 py-6">
                   {res.annualSaving > 0 ? (
                     <span className="text-primary font-bold">-{res.annualSaving.toFixed(2)}€</span>
                   ) : (
-                    <span className="text-gray-300 font-bold">Indisponível</span>
+                    <span className="text-red-500 font-bold">+{Math.abs(res.annualSaving).toFixed(2)}€</span>
                   )}
                 </td>
                 <td className="px-8 py-6 text-right">

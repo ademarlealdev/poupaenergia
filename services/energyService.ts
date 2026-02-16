@@ -68,7 +68,9 @@ export const extractBillData = async (file: File): Promise<BillData> => {
 export const compareTariffs = async (currentData: BillData): Promise<ComparisonResult[]> => {
   const { data: tariffs, error } = await supabase
     .from('tariffs')
-    .select('*');
+    .select('*')
+    .lte('valid_from', new Date().toISOString())
+    .gte('valid_to', new Date().toISOString());
 
   if (error || !tariffs) {
     console.error("Error fetching tariffs:", error);
@@ -98,7 +100,7 @@ export const compareTariffs = async (currentData: BillData): Promise<ComparisonR
       annualSaving,
       savingPercentage
     };
-  }).sort((a, b) => a.annualCost - b.annualCost);
+  }).sort((a, b) => b.annualSaving - a.annualSaving);
 };
 
 export const submitChangeRequest = async (data: any): Promise<boolean> => {
@@ -117,6 +119,8 @@ export const getTariffs = async (): Promise<Provider[]> => {
   const { data: tariffs, error } = await supabase
     .from('tariffs')
     .select('*')
+    .lte('valid_from', new Date().toISOString())
+    .gte('valid_to', new Date().toISOString())
     .order('price_kwh', { ascending: true });
 
   if (error || !tariffs) {

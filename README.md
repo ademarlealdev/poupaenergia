@@ -18,3 +18,10 @@ View your app in AI Studio: https://ai.studio/apps/drive/1YarliyKuZ6xrdt5Tb5LcOH
 2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
 3. Run the app:
    `npm run dev`
+
+## Data Updates
+
+Currently, the tariff data in the database is **manually updated**. There is no automated background process scraping the provider websites.
+However, the application always fetches the **latest data available in the database** at the moment of analysis.
+
+To update prices, an administrator must run SQL updates on the database.

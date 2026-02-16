@@ -21,7 +21,7 @@ const App: React.FC = () => {
   return (
     <HashRouter>
       <div className="flex flex-col min-h-screen">
-        <Navbar />
+        <Navbar hasData={!!extractedData} />
         <main className="flex-grow pt-16">
           <Routes>
             <Route path="/" element={<LandingPage />} />
