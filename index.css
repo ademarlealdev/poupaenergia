@@ -32,6 +32,10 @@
 }
 
 @layer base {
+  html {
+    font-size: 18px;
+  }
+
   body {
     @apply font-sans bg-[#0F172A] text-white selection:bg-primary/30;
     min-height: 100vh;

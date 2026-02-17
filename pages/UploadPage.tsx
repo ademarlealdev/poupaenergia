@@ -1,5 +1,5 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { extractBillData } from '../services/energyService';
 import { BillData } from '../types';
@@ -17,9 +17,19 @@ const UploadPage: React.FC<UploadPageProps> = ({ onDataExtracted }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
+  const validateAndSetFile = (file: File) => {
+    if (file.type !== 'application/pdf') {
+      setErrorStatus('Por favor carregue apenas ficheiros PDF.');
+      setFile(null); // Clear file to show upload area again
+    } else {
+      setErrorStatus(null);
+      setFile(file);
+    }
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
+      validateAndSetFile(e.target.files[0]);
     }
   };
 
@@ -27,18 +37,20 @@ const UploadPage: React.FC<UploadPageProps> = ({ onDataExtracted }) => {
     e.preventDefault();
   };
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      setFile(e.dataTransfer.files[0]);
+      validateAndSetFile(e.dataTransfer.files[0]);
     }
-  };
+  }, []);
 
   const startAnalysis = async () => {
     if (!file) return;
 
     setAnalyzing(true);
     setProgress(0);
+    setErrorStatus(null);
+    setShowManualForm(false); // Reset manual form visibility on new attempt
 
     // Simulate progress
     const interval = setInterval(() => {
@@ -52,23 +64,34 @@ const UploadPage: React.FC<UploadPageProps> = ({ onDataExtracted }) => {
     }, 100);
 
     try {
+      const startTime = performance.now();
       const data = await extractBillData(file);
+      const endTime = performance.now();
+
+      const analysisDuration = (endTime - startTime) / 1000;
+      const dataWithTime = { ...data, analysisTime: analysisDuration };
+
       setProgress(100);
-      onDataExtracted(data);
-      setTimeout(() => {
-        navigate('/resultado');
-      }, 500);
+      clearInterval(interval);
+      onDataExtracted(dataWithTime);
+      navigate('/resultado');
     } catch (error: any) {
       console.error("Extraction failed", error);
-      if (error.message === "AI_LIMIT_EXCEEDED") {
+      clearInterval(interval);
+      // Reset file and analyzing state to allow retry
+      setAnalyzing(false);
+      setFile(null); // Optional: clear file if we want them to re-select, or keep it. Let's keep it but allow re-selection. Actually clearing it makes it clear they need to try again or try another file.
+
+      if (error.message === "INVOICE_TOO_OLD") {
+        setErrorStatus("A fatura enviada tem mais de 3 meses. Por favor, envie uma fatura recente para garantir a precisão dos dados.");
+        setShowManualForm(false);
+      } else if (error.message === "AI_LIMIT_EXCEEDED") {
         setErrorStatus("O serviço de Inteligência Artificial está temporariamente indisponível (limite de quota).");
         setShowManualForm(true);
       } else {
-        alert("Erro ao extrair dados. Por favor tente novamente ou preencha manualmente.");
+        setErrorStatus("Erro ao extrair dados. Por favor tente novamente ou preencha manualmente.");
         setShowManualForm(true);
       }
-    } finally {
-      setAnalyzing(false);
     }
   };
 
@@ -90,8 +113,20 @@ const UploadPage: React.FC<UploadPageProps> = ({ onDataExtracted }) => {
     <div className="max-w-4xl mx-auto px-6 py-12">
       <div className="text-center mb-10">
         <h1 className="text-3xl font-bold text-white mb-2">Análise de Fatura</h1>
-        <p className="text-gray-300">Envie a sua fatura em PDF ou imagem para começarmos.</p>
+        <p className="text-gray-300">Envie a sua fatura em PDF para começarmos.</p>
       </div>
+
+      {errorStatus && !showManualForm && (
+        <div className="mb-8 bg-red-500/10 border border-red-500/20 rounded-2xl p-6 flex items-start gap-4 animate-in fade-in slide-in-from-top-4">
+          <div className="w-10 h-10 bg-red-500/20 text-red-400 rounded-full flex items-center justify-center shrink-0">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+          </div>
+          <div>
+            <h3 className="font-bold text-white text-lg mb-1">Atenção</h3>
+            <p className="text-red-200">{errorStatus}</p>
+          </div>
+        </div>
+      )}
 
       <div className="glass-card rounded-3xl p-12 text-center transition-all hover:border-primary/50 relative overflow-hidden group"
         onDragOver={handleDragOver}
@@ -109,13 +144,15 @@ const UploadPage: React.FC<UploadPageProps> = ({ onDataExtracted }) => {
               <div className="mb-6">
                 <p className="font-semibold text-white text-lg">{file.name}</p>
                 <p className="text-sm text-gray-400">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
-                <button
-                  onClick={() => setFile(null)}
-                  className="text-red-400 text-sm font-medium mt-3 hover:text-red-300 transition-colors flex items-center gap-2 mx-auto"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                  Remover ficheiro
-                </button>
+                <div className="flex gap-4 justify-center mt-3">
+                  <button
+                    onClick={() => setFile(null)}
+                    className="text-red-400 text-sm font-medium hover:text-red-300 transition-colors flex items-center gap-2"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    Remover ficheiro
+                  </button>
+                </div>
               </div>
             ) : (
               <div className="mb-8">
@@ -128,7 +165,7 @@ const UploadPage: React.FC<UploadPageProps> = ({ onDataExtracted }) => {
               type="file"
               ref={fileInputRef}
               onChange={handleFileChange}
-              accept=".pdf,image/*"
+              accept=".pdf"
               className="hidden"
             />
 

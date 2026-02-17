@@ -5,6 +5,7 @@ export interface BillData {
   potenciaContratada: string;
   precoKwh: number;
   totalFatura: number;
+  analysisTime?: number;
 }
 
 export interface Provider {

@@ -23,11 +23,12 @@ export const extractBillData = async (file: File): Promise<BillData> => {
 
   const prompt = `
     Analyze this electricity bill and extract the following information in JSON format:
-    - fornecedorAtual (string)
-    - consumoMensalKwh (number, total kWh for the period)
+    - fornecedorAtual (string, the name of the energy provider)
+    - consumoMensalKwh (number, TOTAL monthly consumption in kWh. Sum all 'Termo de Energia' consumption lines. Do NOT count 'Termo de Potência' or days.)
     - potenciaContratada (string, e.g. "6.9 kVA")
-    - precoKwh (number, average price per kWh)
-    - totalFatura (number, total amount in Euros)
+    - precoKwh (number, the effective UNIT price per kWh in Euros. Look for 'Termo de Energia' or 'Energia'. If there is a discounted price (e.g. 'Preço com desconto'), use the DISCOUNTED unit price. Do NOT sum unit prices from multiple lines. Do NOT average them manually unless they are different rates (e.g. Empty/Full). If lines have the same price, just use that price. Example: if 0.1697 is base and 0.1323 is discounted, return 0.1323)
+    - totalFatura (number, total amount to pay in Euros)
+    - dataFatura (string, the date of the invoice in YYYY-MM-DD format. Look for 'Data de Emissão', 'Data', or similar.)
 
     Return ONLY the JSON.
   `;
@@ -48,10 +49,27 @@ export const extractBillData = async (file: File): Promise<BillData> => {
     const response = await result.response;
     const text = response.text();
     const cleanedText = text.replace(/```json|```/g, '').trim();
-    return JSON.parse(cleanedText) as BillData;
+    const parsedData = JSON.parse(cleanedText);
+
+    // Date Validation
+    if (parsedData.dataFatura) {
+      const invoiceDate = new Date(parsedData.dataFatura);
+      const threeMonthsAgo = new Date();
+      threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+
+      if (invoiceDate < threeMonthsAgo) {
+        throw new Error("INVOICE_TOO_OLD");
+      }
+    }
+
+    return parsedData as BillData;
 
   } catch (error: any) {
     console.error("Gemini API failure:", error);
+
+    if (error.message === "INVOICE_TOO_OLD") {
+      throw error; // Re-throw specifically
+    }
 
     // Throw a specific error for quota/not found so the UI can offer manual entry
     const isQuota = error.message?.includes("429") || error.message?.includes("quota");
