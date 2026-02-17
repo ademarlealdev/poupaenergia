@@ -6,7 +6,7 @@
 
 Aplicação para análise e comparação de tarifas de energia em Portugal.
 
-Ver app online: [https://poupaenergia.vercel.app](https://poupaenergia.vercel.app)
+Ver app online: [https://energiacerta.vercel.app](https://energiacerta.vercel.app)
 
 ## Run Locally
 
