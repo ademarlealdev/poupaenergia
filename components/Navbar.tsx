@@ -34,14 +34,14 @@ const Navbar: React.FC<{ hasData: boolean }> = ({ hasData }) => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 h-20 bg-[#0B0F19]/80 backdrop-blur-md border-b border-white/5 z-50 transition-all">
-      <div className="flex items-center justify-between px-6 md:px-12 h-full">
+      <div className="relative flex items-center justify-between px-6 md:px-12 h-full">
         <Link to="/" className="flex items-center gap-3">
           <img src="/logo.svg" alt="EnergiaCerta Logo" className="w-9 h-9" />
           <span className="text-xl font-bold text-white tracking-tight">Energia<span className="text-primary">Certa</span></span>
         </Link>
 
-        {/* Desktop Menu */}
-        <div className="hidden md:flex items-center gap-2 text-sm font-medium">
+        {/* Desktop Menu - Centered */}
+        <div className="hidden md:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 items-center gap-1 bg-white/5 backdrop-blur-md px-2 py-1.5 rounded-full border border-white/5">
           <NavLink to="/">Como funciona</NavLink>
           <NavLink to="/upload">Analisar Fatura</NavLink>
           <NavLink to="/tarifarios">Tarifários</NavLink>
@@ -50,27 +50,30 @@ const Navbar: React.FC<{ hasData: boolean }> = ({ hasData }) => {
           )}
         </div>
 
-        {/* Desktop CTA */}
-        <div className="hidden md:block">
-          <Link
-            to="/upload"
-            className="bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-full text-sm font-semibold transition-all shadow-lg shadow-primary/20 hover:shadow-primary/40"
-          >
-            Começar Grátis
-          </Link>
-        </div>
+        {/* Right Side Actions */}
+        <div className="flex items-center gap-4">
+          {/* Desktop CTA */}
+          <div className="hidden md:block">
+            <Link
+              to="/upload"
+              className="bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-full text-sm font-semibold transition-all shadow-lg shadow-primary/20 hover:shadow-primary/40"
+            >
+              Começar Grátis
+            </Link>
+          </div>
 
-        {/* Mobile Menu Button */}
-        <button
-          className="md:hidden p-2 text-gray-400 hover:text-white"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-        >
-          {isMenuOpen ? (
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
-          ) : (
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
-          )}
-        </button>
+          {/* Mobile Menu Button */}
+          <button
+            className="md:hidden p-2 text-gray-400 hover:text-white"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            {isMenuOpen ? (
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            ) : (
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Menu */}

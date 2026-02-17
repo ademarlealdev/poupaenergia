@@ -1,12 +1,12 @@
 <div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+<img width="300" alt="EnergiaCerta Logo" src="public/logo-brand.jpg" />
 </div>
 
-# Run and deploy your AI Studio app
+# EnergiaCerta - Análise de Fatura de Energia
 
-This contains everything you need to run your app locally.
+Aplicação para análise e comparação de tarifas de energia em Portugal.
 
-View your app in AI Studio: https://ai.studio/apps/drive/1YarliyKuZ6xrdt5Tb5LcOH9RYG-zi9Hd
+Ver app online: [https://poupaenergia.vercel.app](https://poupaenergia.vercel.app)
 
 ## Run Locally
 

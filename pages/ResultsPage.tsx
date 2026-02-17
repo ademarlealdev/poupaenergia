@@ -160,7 +160,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ data: initialData }) => {
                 <div className="grid grid-cols-2 gap-4 mb-8">
                   <div className="bg-white/5 p-6 rounded-2xl border border-white/5">
                     <p className="text-gray-400 text-xs mb-2 uppercase tracking-tight font-bold">Poupança Mensal</p>
-                    <p className="text-3xl font-bold text-green-400">{bestOption.monthlySaving.toFixed(2)}€</p>
+                    <p className="text-3xl font-bold text-emerald-400">{bestOption.monthlySaving.toFixed(2)}€</p>
                   </div>
                   <div className="bg-primary/10 p-6 rounded-2xl border border-primary/20 relative overflow-hidden">
                     <div className="absolute inset-0 bg-primary/5 blur-xl"></div>
@@ -236,16 +236,16 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ data: initialData }) => {
                 <td className="px-8 py-6 font-bold text-white border-b border-white/5">{res.annualCost.toFixed(2)}€</td>
                 <td className="px-8 py-6 border-b border-white/5">
                   {res.monthlySaving > 0 ? (
-                    <span className="text-green-400 font-bold">-{res.monthlySaving.toFixed(2)}€</span>
+                    <span className="text-emerald-400 font-bold">-{res.monthlySaving.toFixed(2)}€</span>
                   ) : (
-                    <span className="text-red-400 font-bold">+{Math.abs(res.monthlySaving).toFixed(2)}€</span>
+                    <span className="text-rose-400 font-bold">+{Math.abs(res.monthlySaving).toFixed(2)}€</span>
                   )}
                 </td>
                 <td className="px-8 py-6 border-b border-white/5">
                   {res.annualSaving > 0 ? (
-                    <span className="text-primary font-bold">-{res.annualSaving.toFixed(2)}€</span>
+                    <span className="text-emerald-400 font-bold">-{res.annualSaving.toFixed(2)}€</span>
                   ) : (
-                    <span className="text-red-400 font-bold">+{Math.abs(res.annualSaving).toFixed(2)}€</span>
+                    <span className="text-rose-400 font-bold">+{Math.abs(res.annualSaving).toFixed(2)}€</span>
                   )}
                 </td>
                 <td className="px-8 py-6 text-right border-b border-white/5">
