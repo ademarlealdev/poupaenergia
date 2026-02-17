@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -11,9 +10,9 @@ const Navbar: React.FC<{ hasData: boolean }> = ({ hasData }) => {
   const NavLink = ({ to, children, className }: { to: string, children: React.ReactNode, className?: string }) => (
     <Link
       to={to}
-      className={`px-4 py-2 rounded-full transition-all duration-200 ${isActive(to)
-        ? 'bg-primary/10 text-primary font-bold'
-        : 'text-gray-600 hover:text-primary hover:bg-gray-50'
+      className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${isActive(to)
+        ? 'text-white bg-white/10'
+        : 'text-gray-400 hover:text-white hover:bg-white/5'
         } ${className || ''}`}
     >
       {children}
@@ -26,7 +25,7 @@ const Navbar: React.FC<{ hasData: boolean }> = ({ hasData }) => {
       onClick={onClick}
       className={`block px-4 py-3 rounded-xl transition-all duration-200 ${isActive(to)
         ? 'bg-primary/10 text-primary font-bold'
-        : 'text-gray-600 font-medium hover:bg-gray-50'
+        : 'text-gray-400 font-medium hover:bg-gray-50'
         }`}
     >
       {children}
@@ -34,11 +33,11 @@ const Navbar: React.FC<{ hasData: boolean }> = ({ hasData }) => {
   );
 
   return (
-    <nav className="fixed top-0 left-0 right-0 h-16 bg-white/80 backdrop-blur-md border-b border-gray-100 z-50">
+    <nav className="fixed top-0 left-0 right-0 h-20 bg-[#0B0F19]/80 backdrop-blur-md border-b border-white/5 z-50 transition-all">
       <div className="flex items-center justify-between px-6 md:px-12 h-full">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold">P</div>
-          <span className="text-xl font-bold text-secondary tracking-tight">Poupa<span className="text-primary">Energia</span></span>
+        <Link to="/" className="flex items-center gap-3">
+          <img src="/logo.svg" alt="EnergiaCerta Logo" className="w-9 h-9" />
+          <span className="text-xl font-bold text-white tracking-tight">Energia<span className="text-primary">Certa</span></span>
         </Link>
 
         {/* Desktop Menu */}
@@ -55,7 +54,7 @@ const Navbar: React.FC<{ hasData: boolean }> = ({ hasData }) => {
         <div className="hidden md:block">
           <Link
             to="/upload"
-            className="bg-primary hover:bg-green-600 text-white px-5 py-2 rounded-full text-sm font-semibold transition-all shadow-sm hover:shadow-md"
+            className="bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-full text-sm font-semibold transition-all shadow-lg shadow-primary/20 hover:shadow-primary/40"
           >
             Começar Grátis
           </Link>
@@ -63,7 +62,7 @@ const Navbar: React.FC<{ hasData: boolean }> = ({ hasData }) => {
 
         {/* Mobile Menu Button */}
         <button
-          className="md:hidden p-2 text-gray-600"
+          className="md:hidden p-2 text-gray-400 hover:text-white"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
         >
           {isMenuOpen ? (
@@ -76,7 +75,7 @@ const Navbar: React.FC<{ hasData: boolean }> = ({ hasData }) => {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden bg-white border-b border-gray-100 absolute top-16 left-0 right-0 p-6 flex flex-col gap-2 shadow-xl animate-in fade-in slide-in-from-top-4">
+        <div className="md:hidden bg-[#0B0F19] border-b border-white/5 absolute top-20 left-0 right-0 p-6 flex flex-col gap-2 shadow-xl animate-in fade-in slide-in-from-top-4">
           <MobileNavLink to="/" onClick={() => setIsMenuOpen(false)}>Como funciona</MobileNavLink>
           <MobileNavLink to="/upload" onClick={() => setIsMenuOpen(false)}>Analisar Fatura</MobileNavLink>
           <MobileNavLink to="/tarifarios" onClick={() => setIsMenuOpen(false)}>Tarifários</MobileNavLink>
@@ -85,7 +84,7 @@ const Navbar: React.FC<{ hasData: boolean }> = ({ hasData }) => {
           )}
           <Link
             to="/upload"
-            className="bg-primary hover:bg-green-600 text-white px-5 py-3 rounded-xl text-center font-bold transition-all shadow-sm hover:shadow-md mt-4"
+            className="bg-primary hover:bg-primary/90 text-white px-5 py-3 rounded-xl text-center font-bold transition-all shadow-lg mt-4"
             onClick={() => setIsMenuOpen(false)}
           >
             Começar Grátis

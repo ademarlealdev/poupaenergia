@@ -1,34 +1,36 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 
 const LandingPage: React.FC = () => {
   return (
-    <div className="bg-background">
+    <div className="bg-transparent min-h-screen">
       {/* Hero Section */}
-      <section className="relative px-6 pt-20 pb-24 md:pt-32 md:pb-40 overflow-hidden">
-        <div className="absolute top-0 right-0 -z-10 w-1/2 h-1/2 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-        <div className="max-w-5xl mx-auto text-center">
-          <div className="inline-block px-4 py-1.5 mb-6 bg-primary/10 text-primary text-sm font-semibold rounded-full">
-            🚀 Poupe até 200€ por ano
+      <section className="relative px-6 pt-32 pb-32 md:pt-40 md:pb-48 overflow-hidden">
+        {/* Animated Glows */}
+        <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px] animate-blob mix-blend-screen opacity-50"></div>
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[#8B5CF6]/10 rounded-full blur-[100px] animate-blob animation-delay-2000 opacity-30"></div>
+
+        <div className="relative max-w-5xl mx-auto text-center z-10">
+          <div className="inline-block px-4 py-1.5 mb-8 bg-white/5 backdrop-blur-sm border border-white/10 text-primary text-sm font-semibold rounded-full shadow-lg shadow-primary/5">
+            <span className="mr-2">⚡</span> Poupe até 200€ por ano na sua fatura
           </div>
-          <h1 className="text-4xl md:text-6xl font-extrabold text-secondary mb-6 leading-tight">
-            Descubra se está a pagar <br /> <span className="text-primary">energia a mais</span>
+          <h1 className="text-5xl md:text-7xl font-extrabold text-white mb-8 leading-tight tracking-tight drop-shadow-sm">
+            Descubra se está a pagar <br /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-[#8B5CF6]">energia a mais</span>
           </h1>
-          <p className="text-lg md:text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
-            Faça upload da sua fatura e veja em segundos quanto pode poupar. 
+          <p className="text-lg md:text-xl text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed">
+            Faça upload da sua fatura e veja em segundos quanto pode poupar.
             Sem compromissos, 100% automático e gratuito.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link 
-              to="/upload" 
-              className="w-full sm:w-auto px-10 py-4 bg-primary text-white font-bold rounded-2xl hover:bg-green-600 transition-all shadow-lg hover:shadow-primary/30 flex items-center justify-center gap-2"
+          <div className="flex flex-col sm:flex-row gap-5 justify-center items-center">
+            <Link
+              to="/upload"
+              className="group relative w-full sm:w-auto px-10 py-4 bg-primary text-white font-bold rounded-2xl hover:bg-primary/90 transition-all shadow-[0_0_40px_-10px_rgba(217,70,239,0.5)] hover:shadow-[0_0_60px_-15px_rgba(217,70,239,0.6)] flex items-center justify-center gap-3 overflow-hidden"
             >
-              Analisar a minha fatura
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+              <span className="relative z-10">Analisar a minha fatura</span>
+              <svg className="w-5 h-5 relative z-10 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
             </Link>
-            <p className="text-sm text-gray-400 flex items-center gap-1">
-              <svg className="w-4 h-4 text-primary" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path></svg>
+            <p className="text-sm text-gray-500 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
               Análise em menos de 10s
             </p>
           </div>
@@ -36,53 +38,72 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Steps Section */}
-      <section className="py-24 px-6 bg-white">
+      <section className="py-24 px-6 relative">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-secondary mb-4">Comece a poupar hoje</h2>
-            <p className="text-gray-500">O processo é simples, rápido e totalmente digital.</p>
+          <div className="text-center mb-20">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Como funciona</h2>
+            <p className="text-gray-400 max-w-xl mx-auto">Três passos simples para começar a poupar na sua conta de luz e gás sem qualquer custo.</p>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            <div className="group text-center">
-              <div className="w-16 h-16 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-primary group-hover:text-white transition-all duration-300">
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="group glass-card p-10 rounded-3xl hover:bg-white/5 transition-all duration-300 relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-32 bg-primary/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 group-hover:bg-primary/10 transition-all"></div>
+
+              <div className="w-14 h-14 bg-white/5 border border-white/10 text-primary rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-all duration-300">
+                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
               </div>
-              <h3 className="text-xl font-bold text-secondary mb-3">1. Upload da fatura</h3>
-              <p className="text-gray-500">Arraste a sua fatura em PDF ou imagem para o nosso sistema seguro.</p>
+              <h3 className="text-xl font-bold text-white mb-4">1. Upload Seguro</h3>
+              <p className="text-gray-400 leading-relaxed">Carregue o PDF da sua última fatura de forma totalmente segura e encriptada.</p>
             </div>
 
-            <div className="group text-center">
-              <div className="w-16 h-16 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-primary group-hover:text-white transition-all duration-300">
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+            <div className="group glass-card p-10 rounded-3xl hover:bg-white/5 transition-all duration-300 relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-32 bg-[#8B5CF6]/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 group-hover:bg-[#8B5CF6]/10 transition-all"></div>
+
+              <div className="w-14 h-14 bg-white/5 border border-white/10 text-primary rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-all duration-300">
+                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
               </div>
-              <h3 className="text-xl font-bold text-secondary mb-3">2. Comparação automática</h3>
-              <p className="text-gray-500">O nosso motor de IA analisa os dados e compara com todos os fornecedores.</p>
+              <h3 className="text-xl font-bold text-white mb-4">2. Análise Inteligente</h3>
+              <p className="text-gray-400 leading-relaxed">O nosso sistema identifica automaticamente as melhores tarifas para o seu perfil de consumo.</p>
             </div>
 
-            <div className="group text-center">
-              <div className="w-16 h-16 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-primary group-hover:text-white transition-all duration-300">
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            <div className="group glass-card p-10 rounded-3xl hover:bg-white/5 transition-all duration-300 relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-32 bg-blue-500/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 group-hover:bg-blue-500/10 transition-all"></div>
+
+              <div className="w-14 h-14 bg-white/5 border border-white/10 text-primary rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-all duration-300">
+                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
               </div>
-              <h3 className="text-xl font-bold text-secondary mb-3">3. Mudar e poupar</h3>
-              <p className="text-gray-500">Se houver poupança, tratamos de tudo para mudar de fornecedor num clique.</p>
+              <h3 className="text-xl font-bold text-white mb-4">3. Resultados Imediatos</h3>
+              <p className="text-gray-400 leading-relaxed">Receba um relatório detalhado com o potencial de poupança mensal e como mudar.</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Trust Section */}
-      <section className="py-24 px-6 bg-background">
-        <div className="max-w-5xl mx-auto rounded-3xl bg-secondary p-12 text-center text-white relative overflow-hidden shadow-2xl">
-          <div className="absolute bottom-0 right-0 w-64 h-64 bg-primary opacity-20 rounded-full translate-y-1/2 translate-x-1/2 blur-3xl"></div>
-          <h2 className="text-3xl font-bold mb-6">Pronto para pagar menos?</h2>
-          <p className="text-gray-400 mb-10 max-w-xl mx-auto">Milhares de portugueses já pouparam mais de 1 milhão de euros em faturas de eletricidade este ano.</p>
-          <Link 
-            to="/upload" 
-            className="inline-block px-10 py-4 bg-primary text-white font-bold rounded-2xl hover:bg-green-600 transition-all shadow-lg"
-          >
-            Começar Agora
-          </Link>
+      {/* CTA Section */}
+      <section className="py-24 px-6 relative">
+        <div className="max-w-5xl mx-auto rounded-[2.5rem] bg-gradient-to-b from-[#1E293B] to-[#0F172A] border border-white/5 p-12 md:p-20 text-center relative overflow-hidden shadow-2xl">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full translate-y-[-50%] translate-x-[50%] blur-[80px]"></div>
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary/10 rounded-full translate-y-[50%] translate-x-[-50%] blur-[80px]"></div>
+
+          <h2 className="text-3xl md:text-5xl font-bold text-white mb-8 leading-tight">Pronto para poupar centenas <br /> de euros por ano?</h2>
+          <p className="text-gray-400 mb-12 max-w-xl mx-auto text-lg">Junte-se a milhares de utilizadores que já otimizaram os seus custos de energia com a nossa tecnologia de análise.</p>
+
+          <div className="flex justify-center">
+            <div className="bg-white/5 p-1.5 rounded-2xl md:rounded-full border border-white/10 flex flex-col md:flex-row w-full max-w-md">
+              <input
+                type="email"
+                placeholder="O seu email profissional"
+                className="bg-transparent border-none text-white placeholder-gray-500 px-6 py-3 outline-none w-full"
+              />
+              <Link
+                to="/upload"
+                className="px-8 py-3 bg-primary text-white font-bold rounded-xl md:rounded-full hover:bg-primary/90 transition-all shadow-lg whitespace-nowrap mt-2 md:mt-0 flex items-center justify-center"
+              >
+                Começar Agora
+              </Link>
+            </div>
+          </div>
+          <p className="text-xs text-gray-600 mt-6 md:mt-4">Ao clicar aceita os nossos termos e política de privacidade.</p>
         </div>
       </section>
     </div>

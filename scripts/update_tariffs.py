@@ -110,6 +110,7 @@ async def update_tariffs(mock_mode=False):
             provider_name = offer.get("Comercializador", "").strip()
             price_str = str(offer.get("PrecoTermoenergia", "0")).replace(",", ".")
             price_kwh = float(price_str) if price_str else 0.0
+            logo_url = offer.get("Logotipo", "")
             
             if not provider_name or price_kwh == 0:
                 continue
@@ -121,10 +122,10 @@ async def update_tariffs(mock_mode=False):
 
             # Logic to keep the lowest price
             if provider_name not in best_offers:
-                best_offers[provider_name] = price_kwh
+                best_offers[provider_name] = {"price": price_kwh, "logo": logo_url}
             else:
-                if price_kwh < best_offers[provider_name]:
-                    best_offers[provider_name] = price_kwh
+                if price_kwh < best_offers[provider_name]["price"]:
+                    best_offers[provider_name] = {"price": price_kwh, "logo": logo_url}
                     
         except ValueError:
             continue
@@ -133,7 +134,10 @@ async def update_tariffs(mock_mode=False):
     
     success_count = 0
     
-    for provider_name, price_kwh in best_offers.items():
+    for provider_name, data in best_offers.items():
+        price_kwh = data["price"]
+        logo_url = data["logo"]
+        
         try:
             # 1. Check if record exists
             query_url = f"{supabase_rest_url}?provider_name=eq.{requests.utils.quote(provider_name)}"
@@ -146,6 +150,7 @@ async def update_tariffs(mock_mode=False):
             db_payload = {
                 'provider_name': provider_name,
                 'price_kwh': price_kwh,
+                'logo_url': logo_url,
                 'valid_from': datetime.now().strftime("%Y-%m-%d"),
                 'valid_to': '2026-12-31'
             }
@@ -158,7 +163,7 @@ async def update_tariffs(mock_mode=False):
                 patch_res = requests.patch(patch_url, json=db_payload, headers=supabase_headers)
                 
                 if patch_res.status_code in [200, 204]:
-                    print(f"Updated: {provider_name:<20} -> {price_kwh:.4f} €/kWh")
+                    print(f"Updated: {provider_name:<20} -> {price_kwh:.4f} €/kWh | Logo Updated")
                     success_count += 1
                 else:
                     print(f"Failed to patch {provider_name}: {patch_res.status_code} - {patch_res.text}")
@@ -174,7 +179,7 @@ async def update_tariffs(mock_mode=False):
                 post_res = requests.post(supabase_rest_url, json=db_payload, headers=supabase_headers)
                 
                 if post_res.status_code in [200, 201]:
-                    print(f"Inserted: {provider_name:<20} -> {price_kwh:.4f} €/kWh")
+                    print(f"Inserted: {provider_name:<20} -> {price_kwh:.4f} €/kWh | Logo Saved")
                     success_count += 1
                 else:
                     print(f"Failed to insert {provider_name}: {post_res.status_code} - {post_res.text}")

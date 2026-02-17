@@ -1,5 +1,5 @@
 {
-  "name": "Poupa Energia",
+  "name": "EnergiaCerta",
   "description": "Uma plataforma moderna para analisar faturas de energia em Portugal, comparar tarifários e mudar de fornecedor para maximizar a poupança.",
   "requestFramePermissions": [
     "camera"
