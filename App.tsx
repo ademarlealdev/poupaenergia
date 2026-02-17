@@ -6,10 +6,14 @@ import UploadPage from './pages/UploadPage';
 import ResultsPage from './pages/ResultsPage';
 import ChangePage from './pages/ChangePage';
 import TariffsPage from './pages/TariffsPage';
+import TermosPage from './pages/TermosPage';
+import PrivacidadePage from './pages/PrivacidadePage';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import { BillData } from './types';
 import { supabase } from './services/supabaseClient';
+
+import ScrollToTop from './components/ScrollToTop';
 
 const App: React.FC = () => {
   useEffect(() => {
@@ -20,6 +24,7 @@ const App: React.FC = () => {
 
   return (
     <HashRouter>
+      <ScrollToTop />
       <div className="flex flex-col min-h-screen">
         <Navbar hasData={!!extractedData} />
         <main className="flex-grow pt-16">
@@ -35,6 +40,8 @@ const App: React.FC = () => {
             />
             <Route path="/mudar" element={<ChangePage />} />
             <Route path="/tarifarios" element={<TariffsPage />} />
+            <Route path="/termos" element={<TermosPage />} />
+            <Route path="/privacidade" element={<PrivacidadePage />} />
           </Routes>
         </main>
         <Footer />

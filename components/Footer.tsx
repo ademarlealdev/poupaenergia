@@ -35,8 +35,8 @@ const Footer: React.FC = () => {
 
         {/* Legal Links */}
         <div className="flex gap-6 order-2 md:order-2">
-          <Link to="#" className="hover:text-white transition-colors">Termos</Link>
-          <Link to="#" className="hover:text-white transition-colors">Privacidade</Link>
+          <Link to="/termos" className="hover:text-white transition-colors">Termos</Link>
+          <Link to="/privacidade" className="hover:text-white transition-colors">Privacidade</Link>
           <Link to="#" className="hover:text-white transition-colors">Cookies</Link>
         </div>
 

@@ -31,4 +31,5 @@ export interface ChangeFormData {
   iban?: string;
   telefone: string;
   email: string;
+  fornecedor: string;
 }

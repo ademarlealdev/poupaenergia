@@ -55,6 +55,16 @@
   @apply bg-[#131B2E]/80 border border-white/10 text-white placeholder-gray-500 focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all outline-none;
 }
 
+/* Autofill Hack */
+.glass-input:-webkit-autofill,
+.glass-input:-webkit-autofill:hover,
+.glass-input:-webkit-autofill:focus,
+.glass-input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #131B2E inset !important;
+  -webkit-text-fill-color: white !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 .btn-primary {
   @apply bg-primary hover:bg-primary/90 text-white font-bold transition-all shadow-lg shadow-primary/25 active:scale-95;
 }

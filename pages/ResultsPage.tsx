@@ -241,6 +241,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ data: initialData }) => {
                     <p className="text-gray-300 font-medium mb-8 text-lg">Pronto para começar a pagar menos? Nós tratamos de toda a papelada gratuitamente.</p>
                     <Link
                       to="/mudar"
+                      state={{ fornecedor: bestOption.provider.nome }}
                       className="w-full py-5 bg-primary text-white font-bold text-lg rounded-2xl hover:bg-primary/90 transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-3"
                     >
                       Mudar agora e poupar
@@ -325,7 +326,11 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ data: initialData }) => {
                   )}
                 </td>
                 <td className="px-8 py-6 text-right border-b border-white/5">
-                  <Link to="/mudar" className="text-primary font-bold hover:text-white transition-colors text-sm">Selecionar</Link>
+                  {res.annualSaving > 0 ? (
+                    <Link to="/mudar" state={{ fornecedor: res.provider.nome }} className="text-primary font-bold hover:text-white transition-colors text-sm">Selecionar</Link>
+                  ) : (
+                    <span className="text-gray-600 font-bold text-sm cursor-not-allowed select-none">Selecionar</span>
+                  )}
                 </td>
               </tr>
             ))}
