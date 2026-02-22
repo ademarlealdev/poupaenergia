@@ -24,11 +24,16 @@ export const extractBillData = async (file: File): Promise<BillData> => {
   const prompt = `
     Analyze this electricity bill and extract the following information in JSON format:
     - fornecedorAtual (string, the name of the energy provider)
-    - consumoMensalKwh (number, TOTAL monthly consumption in kWh. Sum all 'Termo de Energia' consumption lines. Do NOT count 'Termo de Potência' or days.)
+    - cicloHorario (string, MUST be one of: "Simples", "Bi-horária", "Tri-horária". Identify based on the periods shown - e.g. "Vazio/Fora Vazio" means Bi-horária.)
+    - consumoMensalKwh (number, TOTAL monthly consumption in kWh.)
+    - consumoPonta (number, optional. Consumption in 'Ponta' period.)
+    - consumoCheias (number, optional. Consumption in 'Cheias' period. For Bi-horária, map 'Fora de Vazio' here.)
+    - consumoVazio (number, optional. Consumption in 'Vazio' period.)
     - potenciaContratada (string, e.g. "6.9 kVA")
-    - precoKwh (number, the effective UNIT price per kWh in Euros. Look for 'Termo de Energia' or 'Energia'. If there is a discounted price (e.g. 'Preço com desconto'), use the DISCOUNTED unit price. Do NOT sum unit prices from multiple lines. Do NOT average them manually unless they are different rates (e.g. Empty/Full). If lines have the same price, just use that price. Example: if 0.1697 is base and 0.1323 is discounted, return 0.1323)
+    - termoPotencia (number, the DAILY fixed cost for power in Euros.)
+    - precoKwh (number, the effective UNIT price per kWh in Euros. If dynamic or multiple lines, use the most representative one.)
     - totalFatura (number, total amount to pay in Euros)
-    - dataFatura (string, the date of the invoice in YYYY-MM-DD format. Look for 'Data de Emissão', 'Data', or similar.)
+    - dataFatura (string, YYYY-MM-DD format.)
 
     Return ONLY the JSON.
   `;
@@ -84,28 +89,63 @@ export const extractBillData = async (file: File): Promise<BillData> => {
 };
 
 export const compareTariffs = async (currentData: BillData): Promise<ComparisonResult[]> => {
-  const { data: tariffs, error } = await supabase
-    .from('tariffs')
-    .select('*')
-    .lte('valid_from', new Date().toISOString())
-    .gte('valid_to', new Date().toISOString());
 
-  if (error || !tariffs) {
-    console.error("Error fetching tariffs:", error);
-    return [];
-  }
 
-  const currentAnnualCost = currentData.consumoMensalKwh * currentData.precoKwh * 12;
+  const currentAnnualCost = (currentData.consumoMensalKwh * currentData.precoKwh * 12) + ((currentData.termoPotencia || 0) * 365);
 
-  return tariffs.map(t => {
-    const provider: Provider = {
-      nome: t.provider_name,
-      precoKwh: t.price_kwh,
-      logo: t.logo_url
-    };
+  // Parse contracted power (e.g., "6.9 kVA" -> 6.9)
+  const powerStr = currentData.potenciaContratada.toLowerCase().replace('kva', '').replace(',', '.').trim();
+  const power = parseFloat(powerStr) || 6.9;
 
-    const monthlyCost = currentData.consumoMensalKwh * provider.precoKwh;
-    const annualCost = monthlyCost * 12;
+  // Determine Cycle Type (Default Simples)
+  // Logic: We don't extract cycle explicitly yet, so we default to Simples unless user overrides (which we will add support for later in UI)
+  // For now, comparison uses "Simples" or tries to matching existing if possible?
+  // User asked for "filters for power and cycle in Tariffs tab", so comparison logic might stay simple for now unless user edits it.
+  // BUT user said "na simulação à ERSE... opção horária: simples, bi-horária...".
+  // So we should try to support it. 
+  // Since we only have total consumption in BillData, we will assume a profile for Bi/Tri.
+
+  // Default to Simples for automatic comparison for now, until we extract cycle from bill.
+  const cycle: "Simples" | "Bi-horária" | "Tri-horária" = currentData.cicloHorario || "Simples";
+
+  // Fetch tariffs for this specific power level and cycle
+  const tariffs = await getTariffs(power, cycle);
+
+  return tariffs.map(provider => {
+    // Cost Calculation based on Cycle
+    let monthlyEnergyCost = 0;
+
+    if (cycle === 'Bi-horária' && provider.precoKwh2) {
+      // Bi-horária: 
+      // Kwh (price_kwh) = Fora de Vazio (Cheias + Ponta)
+      // Kwh2 (price_kwh_2) = Vazio
+
+      const vazio = currentData.consumoVazio || (currentData.consumoMensalKwh * 0.4);
+      // If we have specific Cheias/Ponta, sum them for Fora Vazio. If not, use remainder of Vazio or default 60%
+      const foraVazio = (currentData.consumoCheias || 0) + (currentData.consumoPonta || 0) || (currentData.consumoMensalKwh - vazio);
+
+      monthlyEnergyCost = (foraVazio * provider.precoKwh) + (vazio * provider.precoKwh2);
+
+    } else if (cycle === 'Tri-horária' && provider.precoKwh2 && provider.precoKwh3) {
+      // Tri-horária:
+      // Kwh (price_kwh) = Ponta
+      // Kwh2 (price_kwh_2) = Cheias
+      // Kwh3 (price_kwh_3) = Vazio
+
+      const ponta = currentData.consumoPonta || (currentData.consumoMensalKwh * 0.2);
+      const cheias = currentData.consumoCheias || (currentData.consumoMensalKwh * 0.5);
+      const vazio = currentData.consumoVazio || (currentData.consumoMensalKwh * 0.3);
+
+      monthlyEnergyCost = (ponta * provider.precoKwh) + (cheias * provider.precoKwh2) + (vazio * provider.precoKwh3);
+
+    } else {
+      // Simples
+      monthlyEnergyCost = currentData.consumoMensalKwh * provider.precoKwh;
+    }
+
+    const monthlyCost = monthlyEnergyCost + (provider.termoPotencia * 30.42);
+    const annualCost = (monthlyEnergyCost * 12) + (provider.termoPotencia * 365);
+
     const annualSaving = currentAnnualCost - annualCost;
     const monthlySaving = annualSaving / 12;
     const savingPercentage = (annualSaving / currentAnnualCost) * 100;
@@ -122,9 +162,23 @@ export const compareTariffs = async (currentData: BillData): Promise<ComparisonR
 };
 
 export const submitChangeRequest = async (data: any): Promise<boolean> => {
+  // Map camelCase to snake_case for database
+  const dbData = {
+    nome: data.nome,
+    nif: data.nif,
+    morada: data.morada,
+    cpe: data.cpe,
+    iban: data.debitoDireto ? data.iban : null, // Only send IBAN if direct debit is active
+    telefone: data.telefone,
+    email: data.email,
+    fornecedor: data.fornecedor,
+    fatura_eletronica: data.faturaEletronica,
+    debito_direto: data.debitoDireto
+  };
+
   const { error } = await supabase
     .from('change_requests')
-    .insert([data]);
+    .insert([dbData]);
 
   if (error) {
     console.error('Error submitting change request:', error);
@@ -133,13 +187,23 @@ export const submitChangeRequest = async (data: any): Promise<boolean> => {
   return true;
 };
 
-export const getTariffs = async (): Promise<Provider[]> => {
-  const { data: tariffs, error } = await supabase
+export const getTariffs = async (contractedPower?: number, cycleType: string = 'Simples'): Promise<Provider[]> => {
+  let query = supabase
     .from('tariffs')
     .select('*')
     .lte('valid_from', new Date().toISOString())
     .gte('valid_to', new Date().toISOString())
     .order('price_kwh', { ascending: true });
+
+  if (contractedPower) {
+    query = query.eq('contracted_power', contractedPower);
+  }
+
+  if (cycleType) {
+    query = query.eq('cycle_type', cycleType);
+  }
+
+  const { data: tariffs, error } = await query;
 
   if (error || !tariffs) {
     console.error("Error fetching tariffs:", error);
@@ -149,6 +213,9 @@ export const getTariffs = async (): Promise<Provider[]> => {
   return tariffs.map(t => ({
     nome: t.provider_name,
     precoKwh: t.price_kwh,
+    precoKwh2: t.price_kwh_2,
+    precoKwh3: t.price_kwh_3,
+    termoPotencia: t.standing_charge,
     logo: t.logo_url
   }));
 };

@@ -5,7 +5,7 @@ import LandingPage from './pages/LandingPage';
 import UploadPage from './pages/UploadPage';
 import ResultsPage from './pages/ResultsPage';
 import ChangePage from './pages/ChangePage';
-import TariffsPage from './pages/TariffsPage';
+import SimulationPage from './pages/SimulationPage';
 import TermosPage from './pages/TermosPage';
 import PrivacidadePage from './pages/PrivacidadePage';
 import Navbar from './components/Navbar';
@@ -34,12 +34,9 @@ const App: React.FC = () => {
               path="/upload"
               element={<UploadPage onDataExtracted={setExtractedData} />}
             />
-            <Route
-              path="/resultado"
-              element={<ResultsPage data={extractedData} />}
-            />
+            <Route path="/resultado" element={<ResultsPage data={extractedData} />} />
             <Route path="/mudar" element={<ChangePage />} />
-            <Route path="/tarifarios" element={<TariffsPage />} />
+            <Route path="/simulacao" element={<SimulationPage />} />
             <Route path="/termos" element={<TermosPage />} />
             <Route path="/privacidade" element={<PrivacidadePage />} />
           </Routes>

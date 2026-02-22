@@ -1,8 +1,27 @@
 
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { compareTariffs } from '../services/energyService';
-import { BillData, ComparisonResult } from '../types';
+import { BillData } from '../types';
+
+interface SimulationResult {
+  comercializador: string;
+  nome_oferta: string;
+  potencia_contratada: number;
+  consumo_kwh: number;
+  termo_fixo_diario: number;
+  energia_unitario: number;
+  p_ponta: number;
+  p_cheias: number;
+  p_vazio: number;
+  ciclo: string;
+  termo_fixo_anual: number;
+  energia_anual: number;
+  taxas_impostos_anual: number;
+  faturacao_total_anual: number;
+  pagamento: string;
+  digital: string;
+  logotipo: string;
+}
 
 interface ResultsPageProps {
   data: BillData | null;
@@ -10,21 +29,80 @@ interface ResultsPageProps {
 
 const ResultsPage: React.FC<ResultsPageProps> = ({ data: initialData }) => {
   const [data, setData] = useState<BillData | null>(initialData);
-  const [results, setResults] = useState<ComparisonResult[]>([]);
+  const [results, setResults] = useState<SimulationResult[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const navigate = useNavigate();
 
+  const getPowerId = (powerLabel: string) => {
+    const val = parseFloat(powerLabel?.toLowerCase().replace('kva', '').replace(',', '.').trim()) || 6.9;
+    if (val <= 1.15) return "0";
+    if (val <= 2.3) return "1";
+    if (val <= 3.45) return "2";
+    if (val <= 4.6) return "3";
+    if (val <= 5.75) return "4";
+    if (val <= 6.9) return "5";
+    if (val <= 10.35) return "6";
+    if (val <= 13.8) return "7";
+    if (val <= 17.25) return "8";
+    return "9"; // 20.7+
+  };
+
+  const getCycleId = (cycleLabel: string) => {
+    if (cycleLabel?.toLowerCase().includes('bi')) return "2";
+    if (cycleLabel?.toLowerCase().includes('tri')) return "3";
+    return "1";
+  };
+
   useEffect(() => {
-    const getResults = async () => {
-      if (data) {
-        setLoading(true);
-        const compResults = await compareTariffs(data);
-        setResults(compResults);
+    const fetchSimulation = async () => {
+      if (!data) return;
+      setLoading(true);
+      setError(null);
+      try {
+        const powerId = getPowerId(data.potenciaContratada);
+        const cycleId = getCycleId(data.cicloHorario || "Simples");
+
+        // Calculate consumption values based on cycle
+        let ePonta = 0, eCheias = 0, eVazio = 0;
+
+        if (cycleId === "1") {
+          ePonta = data.consumoMensalKwh || (data.consumoPonta || 0) + (data.consumoCheias || 0) + (data.consumoVazio || 0);
+          eCheias = 0;
+          eVazio = 0;
+        } else if (cycleId === "2") {
+          ePonta = data.consumoPonta || (data.consumoMensalKwh * 0.6);
+          eCheias = data.consumoCheias || (data.consumoMensalKwh * 0.4);
+          eVazio = 0;
+        } else {
+          ePonta = data.consumoPonta || (data.consumoMensalKwh * 0.17);
+          eCheias = data.consumoCheias || (data.consumoMensalKwh * 0.43);
+          eVazio = data.consumoVazio || (data.consumoMensalKwh * 0.4);
+        }
+
+        const url = `http://127.0.0.1:5000/api/simulation?power_id=${powerId}&cycle=${cycleId}&e_ponta=${Math.round(ePonta)}&e_cheias=${Math.round(eCheias)}&e_vazio=${Math.round(eVazio)}`;
+
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Falha ao obter simulação ERSE');
+        const simData = await response.json();
+        console.log('Results fetched from API:', simData);
+        if (Array.isArray(simData)) {
+          setResults(simData);
+        } else if (simData.error) {
+          throw new Error(simData.error);
+        } else {
+          setResults([]);
+        }
+      } catch (err: any) {
+        console.error('Fetch error on ResultsPage:', err);
+        setError(err.message);
+      } finally {
         setLoading(false);
       }
     };
-    getResults();
+
+    fetchSimulation();
   }, [data]);
 
   const handleUpdateData = (e: React.FormEvent<HTMLFormElement>) => {
@@ -34,6 +112,12 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ data: initialData }) => {
       ...data!,
       consumoMensalKwh: Number(formData.get('consumo')),
       precoKwh: Number(formData.get('preco')),
+      potenciaContratada: formData.get('potencia') as string,
+      termoPotencia: Number(formData.get('termoPotencia')),
+      cicloHorario: formData.get('ciclo') as 'Simples' | 'Bi-horária' | 'Tri-horária',
+      consumoPonta: Number(formData.get('consumoPonta') || 0),
+      consumoCheias: Number(formData.get('consumoCheias') || 0),
+      consumoVazio: Number(formData.get('consumoVazio') || 0),
     };
     setData(updatedData);
     setIsEditing(false);
@@ -49,293 +133,256 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ data: initialData }) => {
     );
   }
 
-  if (loading) {
-    return (
-      <div className="max-w-5xl mx-auto px-6 py-32 text-center">
-        <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-        <h2 className="text-xl font-bold text-white">A comparar tarifários...</h2>
-        <p className="text-gray-400">Estamos a analisar as melhores ofertas do mercado para si.</p>
-      </div>
-    );
-  }
-
-  const bestOption = results[0];
+  const currentAnnualCost = (data.consumoMensalKwh * data.precoKwh * 12) + (data.termoPotencia * 365);
+  const bestOffer = results[0];
+  const annualSaving = bestOffer ? currentAnnualCost - bestOffer.faturacao_total_anual : 0;
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-24">
-      <div className="mb-12 text-center md:text-left">
+    <div className="max-w-7xl mx-auto px-6 py-24">
+      <div className="mb-12">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-white mb-2">
-              {bestOption && bestOption.annualSaving > 0 ? "Boas notícias!" : "Parabéns!"}
+            <h1 className="text-4xl font-bold text-white mb-2 bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">
+              {annualSaving > 0 ? "Oportunidade de Poupança!" : "Parabéns!"}
             </h1>
-            <p className="text-gray-400">
-              {bestOption && bestOption.annualSaving > 0
-                ? "Encontrámos opções mais económicas para o seu perfil."
-                : "Já se encontra com o melhor tarifário do mercado."}
+            <p className="text-gray-400 font-medium">
+              {annualSaving > 0
+                ? `Pode poupar cerca de ${annualSaving.toFixed(2)}€ por ano com uma mudança.`
+                : "Já tem a melhor oferta do mercado para o seu perfil de consumo! 🎉"}
             </p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-4">
             <button
               onClick={() => setIsEditing(!isEditing)}
               className="bg-white/5 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-white/10 transition-all border border-white/10"
             >
-              {isEditing ? 'Cancelar' : 'Ajustar Consumo'}
+              {isEditing ? 'Cancelar' : 'Ajustar Dados'}
             </button>
             <button
               onClick={() => navigate('/upload')}
-              className="bg-white/10 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-white/20 transition-all border border-white/10"
+              className="bg-primary text-white px-6 py-3 rounded-xl font-bold text-sm hover:opacity-90 transition-all shadow-lg shadow-primary/20"
             >
-              Nova análise
+              Nova Análise
             </button>
           </div>
         </div>
 
         {isEditing && (
           <form onSubmit={handleUpdateData} className="mb-12 p-8 glass-card rounded-3xl animate-in fade-in slide-in-from-top-4">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-primary/20 text-primary rounded-full flex items-center justify-center font-bold border border-primary/20">1</div>
-              <h3 className="font-bold text-white">Ajuste os dados para uma comparação 100% real</h3>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div>
                 <label className="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-widest">Consumo Mensal (kWh)</label>
-                <input required name="consumo" type="number" step="1" defaultValue={data.consumoMensalKwh} className="w-full px-5 py-3 rounded-xl bg-[#0B0F19] border border-white/10 text-white focus:border-primary/50 focus:ring-1 focus:ring-primary/50 outline-none font-bold" />
+                <input required name="consumo" type="number" defaultValue={data.consumoMensalKwh} className="w-full px-5 py-3 rounded-xl bg-[#161B26] border border-white/10 text-white" />
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-widest">Preço p/ kWh atual (€)</label>
-                <input required name="preco" type="number" step="0.0001" defaultValue={data.precoKwh} className="w-full px-5 py-3 rounded-xl bg-[#0B0F19] border border-white/10 text-white focus:border-primary/50 focus:ring-1 focus:ring-primary/50 outline-none font-bold" />
+                <label className="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-widest">Preço kWh Atual (€)</label>
+                <input required name="preco" type="number" step="0.0001" defaultValue={data.precoKwh} className="w-full px-5 py-3 rounded-xl bg-[#161B26] border border-white/10 text-white" />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-widest">Potência</label>
+                <input required name="potencia" defaultValue={data.potenciaContratada} className="w-full px-5 py-3 rounded-xl bg-[#161B26] border border-white/10 text-white" />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-widest">Termo Potência (€/dia)</label>
+                <input required name="termoPotencia" type="number" step="0.0001" defaultValue={data.termoPotencia} className="w-full px-5 py-3 rounded-xl bg-[#161B26] border border-white/10 text-white" />
+              </div>
+              <div className="md:col-span-2 lg:col-span-3 grid grid-cols-1 md:grid-cols-4 gap-6 pt-4 border-t border-white/5">
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-500 mb-2 uppercase tracking-widest">Ciclo</label>
+                  <select name="ciclo" defaultValue={data.cicloHorario || "Simples"} className="w-full px-5 py-3 rounded-xl bg-[#161B26] border border-white/10 text-white">
+                    <option value="Simples">Simples</option>
+                    <option value="Bi-horária">Bi-horária</option>
+                    <option value="Tri-horária">Tri-horária</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-500 mb-2 uppercase tracking-widest">Consumo Ponta (kWh)</label>
+                  <input name="consumoPonta" type="number" defaultValue={data.consumoPonta || 0} className="w-full px-5 py-3 rounded-xl bg-[#161B26] border border-white/10 text-white" />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-500 mb-2 uppercase tracking-widest">Consumo Cheias/Fora Vazio (kWh)</label>
+                  <input name="consumoCheias" type="number" defaultValue={data.consumoCheias || 0} className="w-full px-5 py-3 rounded-xl bg-[#161B26] border border-white/10 text-white" />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-500 mb-2 uppercase tracking-widest">Consumo Vazio (kWh)</label>
+                  <input name="consumoVazio" type="number" defaultValue={data.consumoVazio || 0} className="w-full px-5 py-3 rounded-xl bg-[#161B26] border border-white/10 text-white" />
+                </div>
+              </div>
+              <div className="lg:col-span-3">
+                <button type="submit" className="bg-primary text-white px-8 py-4 rounded-2xl font-bold shadow-lg shadow-primary/20 hover:opacity-90 transition-all">
+                  Atualizar Simulação
+                </button>
               </div>
             </div>
-            <button type="submit" className="mt-8 w-full md:w-auto bg-primary text-white px-10 py-4 rounded-xl font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all">
-              Atualizar Comparação
-            </button>
           </form>
         )}
 
-        {!isEditing && (
-          <div className="glass-card p-6 rounded-2xl flex flex-col md:flex-row gap-8 items-center justify-center md:justify-start">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center font-bold text-primary border border-white/5">€</div>
-              <div>
-                <p className="text-gray-500 text-[10px] uppercase font-bold tracking-widest">O seu Fornecedor</p>
-                <p className="font-bold text-white capitalize">{data.fornecedorAtual}</p>
-              </div>
+        <div className="bg-white/5 rounded-3xl border border-white/10 backdrop-blur-sm mb-16 overflow-hidden">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 p-8">
+            <div className="space-y-1">
+              <p className="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Operador Atual</p>
+              <p className="text-xl font-bold text-white capitalize">{data.fornecedorAtual}</p>
             </div>
-            <div className="h-px md:h-8 w-full md:w-px bg-white/10"></div>
-            <div>
-              <p className="text-gray-500 text-[10px] uppercase font-bold tracking-widest">Consumo base</p>
-              <p className="font-bold text-white">{data.consumoMensalKwh} kWh / mês</p>
+            <div className="space-y-1">
+              <p className="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Gasto Atual (Estimado)</p>
+              <p className="text-xl font-bold text-emerald-400">~{currentAnnualCost.toFixed(2)}€ / ano</p>
             </div>
-            <div className="h-px md:h-8 w-full md:w-px bg-white/10"></div>
-            <div>
-              <p className="text-gray-500 text-[10px] uppercase font-bold tracking-widest">Preço base</p>
-              <p className="font-bold text-white">{data.precoKwh} € / kWh</p>
+            <div className="space-y-1">
+              <p className="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Potência Extraída</p>
+              <p className="text-xl font-bold text-white">{data.potenciaContratada}</p>
             </div>
-          </div>
-        )}
-      </div>
-
-      {/* Main Recommendation Card */}
-      {bestOption && (
-        <div className="glass-card rounded-3xl overflow-hidden mb-16 transform transition-transform hover:scale-[1.01] relative">
-          <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-primary/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2"></div>
-
-          <div className="bg-primary/90 backdrop-blur-sm px-8 py-4 flex items-center justify-between text-white border-b border-white/10">
-            <span className="font-bold uppercase tracking-widest text-xs flex items-center gap-2">
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732l-3.354 1.935-1.18 4.455a1 1 0 01-1.933 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732l3.354-1.935 1.18-4.455A1 1 0 0112 2z" clipRule="evenodd"></path></svg>
-              {bestOption.annualSaving > 0 ? "Melhor Opção Encontrada" : "Resultado da Análise"}
-            </span>
-            <div className="flex items-center gap-3">
-              {data.analysisTime && (
-                <span className="text-[10px] text-gray-300 font-mono bg-white/10 px-2 py-1 rounded">
-                  {data.analysisTime.toFixed(2)}s
-                </span>
-              )}
-              <span className={`text-xs font-bold px-3 py-1 rounded-full border border-white/10 ${bestOption.annualSaving > 0 ? 'bg-white/20' : 'bg-green-500/20 text-green-300'}`}>
-                {bestOption.annualSaving > 0 ? "Recomendado" : "Mantém a Melhor Tarifa"}
-              </span>
+            <div className="space-y-1">
+              <p className="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Ciclo Detetado</p>
+              <p className="text-xl font-bold text-white">{data.cicloHorario || "Simples"}</p>
             </div>
           </div>
 
-          <div className="p-8 md:p-12 relative z-10">
-            {/* Header Section */}
-            <div className="flex items-center gap-5 mb-12">
-              {/* Dynamic Logo Logic */}
-              {bestOption.annualSaving > 0 ? (
-                bestOption.provider.logo && <img src={bestOption.provider.logo} alt={bestOption.provider.nome} className="w-20 h-20 rounded-2xl bg-white p-2 object-contain shadow-lg" />
-              ) : (
-                results.find(r => r.provider.nome.toLowerCase().includes(data.fornecedorAtual.toLowerCase()))?.provider.logo ? (
-                  <img
-                    src={results.find(r => r.provider.nome.toLowerCase().includes(data.fornecedorAtual.toLowerCase()))?.provider.logo}
-                    alt={data.fornecedorAtual}
-                    className="w-20 h-20 rounded-2xl bg-white p-2 object-contain shadow-lg"
-                  />
-                ) : (
-                  <div className="w-20 h-20 bg-white/10 rounded-2xl flex items-center justify-center text-3xl font-bold text-white border border-white/10">
-                    {data.fornecedorAtual.charAt(0)}
-                  </div>
-                )
+          {(data.consumoPonta || data.consumoCheias || data.consumoVazio) && (
+            <div className="bg-white/5 border-t border-white/5 px-8 py-4 grid grid-cols-1 md:grid-cols-3 gap-8">
+              {data.cicloHorario === 'Tri-horária' && (
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] text-gray-500 uppercase font-bold">Consumo Ponta</span>
+                  <span className="text-sm font-bold text-white">{data.consumoPonta || 0} kWh</span>
+                </div>
               )}
-
-              <div>
-                <h2 className="text-3xl font-bold text-white capitalize mb-1">
-                  {bestOption.annualSaving > 0 ? bestOption.provider.nome : data.fornecedorAtual}
-                </h2>
-                <div className="flex items-center gap-2">
-                  <span className="text-primary font-bold text-xl">
-                    {bestOption.annualSaving > 0 ? bestOption.provider.precoKwh : data.precoKwh} €
+              {(data.cicloHorario === 'Bi-horária' || data.cicloHorario === 'Tri-horária') && (
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] text-gray-500 uppercase font-bold">
+                    {data.cicloHorario === 'Bi-horária' ? 'Fora de Vazio' : 'Consumo Cheias'}
                   </span>
-                  <span className="text-gray-500 text-sm">/ kWh</span>
+                  <span className="text-sm font-bold text-white">{data.consumoCheias || 0} kWh</span>
+                </div>
+              )}
+              {(data.cicloHorario === 'Bi-horária' || data.cicloHorario === 'Tri-horária') && (
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] text-gray-500 uppercase font-bold">Consumo Vazio</span>
+                  <span className="text-sm font-bold text-white">{data.consumoVazio || 0} kWh</span>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-pulse">
+            {[1, 2, 3, 4, 5, 6].map(i => <div key={i} className="bg-white/5 h-[400px] rounded-3xl border border-white/10"></div>)}
+          </div>
+        ) : error ? (
+          <div className="bg-red-500/10 border border-red-500/20 p-6 rounded-2xl text-red-400">
+            Erro: {error}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {results.length > 0 ? results.map((offer, idx) => (
+              <div key={idx} className="bg-white/5 border border-white/10 p-8 rounded-[40px] hover:bg-white/10 hover:border-primary/30 transition-all duration-500 group relative overflow-hidden">
+                {idx === 0 && (
+                  <div className="absolute top-0 right-0">
+                    <div className="bg-primary text-white text-[10px] font-black px-6 py-2 rounded-bl-3xl shadow-2xl uppercase tracking-tighter">
+                      Melhor Opção
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex items-center justify-between mb-8">
+                  <div className="bg-white rounded-2xl p-3 h-14 w-28 flex items-center justify-center shadow-inner">
+                    {offer.logotipo ? (
+                      <img src={offer.logotipo} alt={offer.comercializador} className="max-h-full max-w-full object-contain" />
+                    ) : (
+                      <span className="font-bold text-gray-900 text-xs text-center">{offer.comercializador}</span>
+                    )}
+                  </div>
+                  <div className="flex flex-col items-end gap-1">
+                    <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all ${offer.ciclo === "1" || offer.ciclo === "Simples" ? "border-emerald-500/30 text-emerald-400 bg-emerald-500/5" :
+                        offer.ciclo === "2" || offer.ciclo?.includes("Bi") ? "border-blue-500/30 text-blue-400 bg-blue-500/5" :
+                          "border-purple-500/30 text-purple-400 bg-purple-500/5"
+                      }`}>
+                      {offer.ciclo === "1" || offer.ciclo === "Simples" ? "Simples" :
+                        offer.ciclo === "2" || offer.ciclo?.includes("Bi") ? "Bi-Horária" : "Tri-Horária"}
+                    </span>
+                  </div>
+                </div>
+
+                <h3 className="text-2xl font-bold mb-6 line-clamp-2 h-16 group-hover:text-primary transition-colors leading-tight">
+                  {offer.nome_oferta}
+                </h3>
+
+                <div className="space-y-4 text-sm border-t border-white/5 pt-8">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-white/5 p-4 rounded-3xl border border-white/5">
+                      <span className="text-[10px] text-gray-500 uppercase block mb-1 font-bold">Termo Fixo</span>
+                      <span className="text-sm font-bold text-emerald-400">{(offer.termo_fixo_diario || 0).toFixed(4)}€</span>
+                      <span className="text-[10px] text-gray-500 block">/ dia</span>
+                    </div>
+                    <div className="bg-white/5 p-4 rounded-3xl border border-white/5 overflow-hidden">
+                      <span className="text-[10px] text-gray-500 uppercase block mb-1 font-bold">Energia</span>
+                      {(offer.ciclo === "1" || offer.ciclo === "Simples") ? (
+                        <>
+                          <span className="text-sm font-bold text-emerald-400">{(offer.energia_unitario || 0).toFixed(4)}€</span>
+                          <span className="text-[10px] text-gray-500 block">/ kWh</span>
+                        </>
+                      ) : (offer.ciclo === "2" || offer.ciclo?.includes("Bi")) ? (
+                        <div className="flex flex-col gap-1">
+                          <div className="flex justify-between items-center text-[10px]">
+                            <span className="text-gray-500">Fora Vazio:</span>
+                            <span className="text-emerald-400 font-bold">{(offer.p_ponta || 0).toFixed(4)}</span>
+                          </div>
+                          <div className="flex justify-between items-center text-[10px]">
+                            <span className="text-gray-500">Vazio:</span>
+                            <span className="text-emerald-400 font-bold">{(offer.p_cheias || 0).toFixed(4)}</span>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col gap-0.5">
+                          <div className="flex justify-between items-center text-[9px]">
+                            <span className="text-gray-500">Ponta:</span>
+                            <span className="text-emerald-400 font-bold">{(offer.p_ponta || 0).toFixed(4)}</span>
+                          </div>
+                          <div className="flex justify-between items-center text-[9px]">
+                            <span className="text-gray-500">Cheias:</span>
+                            <span className="text-emerald-400 font-bold">{(offer.p_cheias || 0).toFixed(4)}</span>
+                          </div>
+                          <div className="flex justify-between items-center text-[9px]">
+                            <span className="text-gray-500">Vazio:</span>
+                            <span className="text-emerald-400 font-bold">{(offer.p_vazio || 0).toFixed(4)}</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between items-end border-t border-white/5 pt-6 mt-8">
+                    <div>
+                      <span className="text-[10px] text-gray-500 uppercase block font-bold tracking-widest mb-1">Custo Total Anual</span>
+                      <span className="text-4xl font-black text-white">{(offer.faturacao_total_anual || 0).toFixed(2)}€</span>
+                    </div>
+                    <div className="text-right">
+                      {currentAnnualCost - (offer.faturacao_total_anual || 0) > 0 ? (
+                        <div className="bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full text-xs font-bold animate-bounce">
+                          Poupa {(currentAnnualCost - (offer.faturacao_total_anual || 0)).toFixed(0)}€
+                        </div>
+                      ) : (
+                        <span className="text-[10px] text-gray-500 uppercase font-bold">{offer.pagamento}</span>
+                      )}
+                    </div>
+                  </div>
+
+                  <Link
+                    to="/mudar"
+                    state={{ fornecedor: offer.comercializador }}
+                    className="w-full mt-8 block py-4 bg-white text-gray-900 font-bold rounded-2xl text-center hover:bg-primary hover:text-white transition-all shadow-xl"
+                  >
+                    Mudar Agora
+                  </Link>
                 </div>
               </div>
-            </div>
-
-            {/* Content Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
-              {/* Left Column */}
-              <div className="flex flex-col h-full">
-                {bestOption.annualSaving > 0 ? (
-                  // Savings View
-                  <>
-                    <div className="grid grid-cols-2 gap-4 mb-8 flex-grow">
-                      <div className="bg-white/5 p-6 rounded-2xl border border-white/5 flex flex-col justify-center">
-                        <p className="text-gray-400 text-xs mb-2 uppercase tracking-tight font-bold">Poupança Mensal</p>
-                        <p className="text-3xl font-bold text-emerald-400">-{bestOption.monthlySaving.toFixed(2)}€</p>
-                      </div>
-                      <div className="bg-primary/10 p-6 rounded-2xl border border-primary/20 relative overflow-hidden flex flex-col justify-center">
-                        <div className="absolute inset-0 bg-primary/5 blur-xl"></div>
-                        <p className="text-primary text-xs mb-2 uppercase tracking-tight font-bold relative z-10">Poupança Anual</p>
-                        <p className="text-3xl font-bold text-white relative z-10">-{bestOption.annualSaving.toFixed(2)}€</p>
-                      </div>
-                    </div>
-                    {/* Progress Bar moved here inside flex col if needed, or keep at bottom */}
-                    <div className="flex items-center gap-3 mt-auto">
-                      <div className="flex-grow bg-[#0B0F19] h-3 rounded-full overflow-hidden border border-white/5">
-                        <div className="bg-gradient-to-r from-primary to-[#8B5CF6] h-full rounded-full shadow-[0_0_10px_rgba(217,70,239,0.5)]" style={{ width: `${Math.min(bestOption.savingPercentage * 4, 100)}%` }}></div>
-                      </div>
-                      <span className="text-primary font-bold whitespace-nowrap">{bestOption.savingPercentage.toFixed(1)}% de poupança</span>
-                    </div>
-                  </>
-                ) : (
-                  // No Savings View
-                  <div className="bg-green-500/10 p-8 rounded-3xl border border-green-500/20 h-full flex flex-col justify-center">
-                    <h3 className="text-green-400 font-bold text-xl mb-4 flex items-center gap-3">
-                      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                      Ótimas Notícias!
-                    </h3>
-                    <p className="text-gray-300 text-lg leading-relaxed">
-                      A sua tarifa atual de <strong className="text-white">{data.precoKwh}€/kWh</strong> já é mais competitiva que a melhor oferta de mercado ({bestOption.provider.precoKwh}€/kWh).
-                    </p>
-                    <p className="text-sm text-gray-400 mt-4 pt-4 border-t border-green-500/20">
-                      Ao manter o seu contrato, poupa <strong className="text-green-400 font-bold">{Math.abs(bestOption.annualSaving).toFixed(2)}€/ano</strong> em comparação com a melhor alternativa.
-                    </p>
-                  </div>
-                )}
+            )) : (
+              <div className="col-span-full py-20 text-center bg-white/5 border border-white/10 rounded-[40px]">
+                <p className="text-gray-500 font-bold uppercase tracking-widest mb-2">Sem resultados da ERSE</p>
+                <p className="text-sm text-gray-600">Tente ajustar os seus dados ou escolher outro ciclo horário.</p>
               </div>
-
-              {/* Right Column (CTA) */}
-              <div className={`bg-white/5 rounded-3xl p-10 flex flex-col items-center justify-center text-center border border-white/5 h-full ${bestOption.annualSaving <= 0 ? 'border-green-500/20 bg-green-500/5' : ''}`}>
-                {bestOption.annualSaving > 0 ? (
-                  <>
-                    <p className="text-gray-300 font-medium mb-8 text-lg">Pronto para começar a pagar menos? Nós tratamos de toda a papelada gratuitamente.</p>
-                    <Link
-                      to="/mudar"
-                      state={{ fornecedor: bestOption.provider.nome }}
-                      className="w-full py-5 bg-primary text-white font-bold text-lg rounded-2xl hover:bg-primary/90 transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-3"
-                    >
-                      Mudar agora e poupar
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                    </Link>
-                    <p className="text-xs text-gray-500 mt-6 flex items-center gap-2">
-                      <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
-                      Sem fidelização em tarifários domésticos
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <p className="text-gray-300 font-medium mb-8 text-lg">Não precisa de fazer nada! Está a poupar com a sua tarifa atual.</p>
-                    <button
-                      disabled
-                      className="w-full py-5 bg-green-500/20 text-green-400 font-bold text-lg rounded-2xl cursor-default flex items-center justify-center gap-3 border border-green-500/20"
-                    >
-                      Mantenha o seu plano
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
-                    </button>
-                    <p className="text-xs text-gray-500 mt-6">
-                      Sugerimos que volte a verificar daqui a 3 meses.
-                    </p>
-                  </>
-                )}
-              </div>
-            </div>
+            )}
           </div>
-        </div>
-      )}
-
-      {/* Comparison Table */}
-      <h3 className="text-2xl font-bold text-white mb-6">Comparação com o Mercado</h3>
-      <div className="glass-card rounded-3xl overflow-hidden overflow-x-auto">
-        <table className="w-full text-left border-collapse">
-          <thead className="bg-white/5 text-gray-400 text-xs font-bold uppercase tracking-widest">
-            <tr>
-              <th className="px-8 py-6 font-semibold border-b border-white/5">Fornecedor</th>
-              <th className="px-8 py-6 font-semibold border-b border-white/5">Preço kWh</th>
-              <th className="px-8 py-6 font-semibold border-b border-white/5">Custo Anual</th>
-              <th className="px-8 py-6 font-semibold border-b border-white/5">Poupança Mensal</th>
-              <th className="px-8 py-6 font-semibold border-b border-white/5">Poupança Anual</th>
-              <th className="px-8 py-6 font-semibold text-right border-b border-white/5">Acção</th>
-            </tr>
-          </thead>
-          <tbody className="">
-            {results.map((res, idx) => (
-              <tr key={idx} className={`hover:bg-white/5 transition-colors ${idx === 0 ? 'bg-primary/5' : ''}`}>
-                <td className="px-8 py-6 border-b border-white/5">
-                  <div className="flex items-center gap-4">
-                    {res.provider.logo ? (
-                      <img
-                        src={res.provider.logo}
-                        alt={res.provider.nome}
-                        className="w-10 h-10 rounded-xl object-contain bg-white p-1"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                          e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                        }}
-                      />
-                    ) : null}
-                    <div className={`w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white font-bold ${res.provider.logo ? 'hidden' : ''}`}>
-                      {res.provider.nome.charAt(0)}
-                    </div>
-                    <span className="font-bold text-white capitalize">{res.provider.nome}</span>
-                  </div>
-                </td>
-                <td className="px-8 py-6 text-gray-400 font-medium border-b border-white/5">{res.provider.precoKwh}€</td>
-                <td className="px-8 py-6 font-bold text-white border-b border-white/5">{res.annualCost.toFixed(2)}€</td>
-                <td className="px-8 py-6 border-b border-white/5">
-                  {res.monthlySaving > 0 ? (
-                    <span className="text-emerald-400 font-bold">-{res.monthlySaving.toFixed(2)}€</span>
-                  ) : (
-                    <span className="text-rose-400 font-bold">+{Math.abs(res.monthlySaving).toFixed(2)}€</span>
-                  )}
-                </td>
-                <td className="px-8 py-6 border-b border-white/5">
-                  {res.annualSaving > 0 ? (
-                    <span className="text-emerald-400 font-bold">-{res.annualSaving.toFixed(2)}€</span>
-                  ) : (
-                    <span className="text-rose-400 font-bold">+{Math.abs(res.annualSaving).toFixed(2)}€</span>
-                  )}
-                </td>
-                <td className="px-8 py-6 text-right border-b border-white/5">
-                  {res.annualSaving > 0 ? (
-                    <Link to="/mudar" state={{ fornecedor: res.provider.nome }} className="text-primary font-bold hover:text-white transition-colors text-sm">Selecionar</Link>
-                  ) : (
-                    <span className="text-gray-600 font-bold text-sm cursor-not-allowed select-none">Selecionar</span>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        )}
       </div>
     </div>
   );

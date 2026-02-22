@@ -44,7 +44,7 @@ const Navbar: React.FC<{ hasData: boolean }> = ({ hasData }) => {
         <div className="hidden md:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 items-center gap-1 bg-white/5 backdrop-blur-md px-2 py-1.5 rounded-full border border-white/5">
           <NavLink to="/">Como funciona</NavLink>
           <NavLink to="/upload">Analisar Fatura</NavLink>
-          <NavLink to="/tarifarios">Tarifários</NavLink>
+          <NavLink to="/simulacao">Simulação</NavLink>
           {hasData && (
             <NavLink to="/resultado" className="!text-primary font-bold">Resultados</NavLink>
           )}
@@ -81,7 +81,7 @@ const Navbar: React.FC<{ hasData: boolean }> = ({ hasData }) => {
         <div className="md:hidden bg-[#0B0F19] border-b border-white/5 absolute top-20 left-0 right-0 p-6 flex flex-col gap-2 shadow-xl animate-in fade-in slide-in-from-top-4">
           <MobileNavLink to="/" onClick={() => setIsMenuOpen(false)}>Como funciona</MobileNavLink>
           <MobileNavLink to="/upload" onClick={() => setIsMenuOpen(false)}>Analisar Fatura</MobileNavLink>
-          <MobileNavLink to="/tarifarios" onClick={() => setIsMenuOpen(false)}>Tarifários</MobileNavLink>
+          <MobileNavLink to="/simulacao" onClick={() => setIsMenuOpen(false)}>Simulação</MobileNavLink>
           {hasData && (
             <MobileNavLink to="/resultado" onClick={() => setIsMenuOpen(false)}>Resultados</MobileNavLink>
           )}

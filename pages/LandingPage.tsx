@@ -34,6 +34,19 @@ const LandingPage: React.FC = () => {
               Análise em menos de 3s
             </p>
           </div>
+
+          <div className="mt-12 pt-8 border-t border-white/5">
+            <p className="text-gray-400 mb-6 font-medium">Ainda não tem fatura? Descubra qual o comercializador mais barato para si.</p>
+            <div className="flex justify-center">
+              <Link
+                to="/simulacao"
+                className="group relative w-full sm:w-auto px-10 py-4 bg-primary text-white font-bold rounded-2xl hover:bg-primary/90 transition-all shadow-[0_0_40px_-10px_rgba(217,70,239,0.5)] hover:shadow-[0_0_60px_-15px_rgba(217,70,239,0.6)] flex items-center justify-center gap-3 overflow-hidden"
+              >
+                <span className="relative z-10">Prosseguir sem fatura</span>
+                <svg className="w-5 h-5 relative z-10 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -89,21 +102,27 @@ const LandingPage: React.FC = () => {
           <p className="text-gray-400 mb-12 max-w-xl mx-auto text-lg">Junte-se a milhares de utilizadores que já otimizaram os seus custos de energia com a nossa tecnologia de análise.</p>
 
           <div className="flex justify-center">
-            <div className="bg-white/5 p-1.5 rounded-2xl md:rounded-full border border-white/10 flex flex-col md:flex-row w-full max-w-md">
-              <input
-                type="email"
-                placeholder="O seu email profissional"
-                className="bg-transparent border-none text-white placeholder-gray-500 px-6 py-3 outline-none w-full"
-              />
+            <Link
+              to="/upload"
+              className="px-10 py-4 bg-primary text-white font-bold rounded-2xl hover:bg-primary/90 transition-all shadow-[0_0_40px_-10px_rgba(217,70,239,0.5)] hover:shadow-[0_0_60px_-15px_rgba(217,70,239,0.6)] flex items-center justify-center gap-3"
+            >
+              <span className="relative z-10">Começar Agora</span>
+              <svg className="w-5 h-5 relative z-10 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+            </Link>
+          </div>
+
+          <div className="mt-8 pt-8 border-t border-white/5">
+            <p className="text-gray-400 mb-4 font-medium">Ainda não tem fatura? Descubra qual o comercializador mais barato para si.</p>
+            <div className="flex justify-center">
               <Link
-                to="/upload"
-                className="px-8 py-3 bg-primary text-white font-bold rounded-xl md:rounded-full hover:bg-primary/90 transition-all shadow-lg whitespace-nowrap mt-2 md:mt-0 flex items-center justify-center"
+                to="/simulacao"
+                className="px-10 py-4 bg-primary text-white font-bold rounded-2xl hover:bg-primary/90 transition-all shadow-[0_0_40px_-10px_rgba(217,70,239,0.5)] hover:shadow-[0_0_60px_-15px_rgba(217,70,239,0.6)] flex items-center justify-center gap-3"
               >
-                Começar Agora
+                <span className="relative z-10">Prosseguir sem fatura</span>
+                <svg className="w-5 h-5 relative z-10 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
               </Link>
             </div>
           </div>
-          <p className="text-xs text-gray-600 mt-6 md:mt-4">Ao clicar aceita os nossos termos e política de privacidade.</p>
         </div>
       </section>
     </div>

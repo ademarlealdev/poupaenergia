@@ -20,7 +20,9 @@ const ChangePage: React.FC = () => {
     iban: '',
     telefone: '',
     email: '',
-    fornecedor: state?.fornecedor || ''
+    fornecedor: state?.fornecedor || '',
+    faturaEletronica: true,
+    debitoDireto: false
   });
   const [agreed, setAgreed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -37,8 +39,11 @@ const ChangePage: React.FC = () => {
   }, [state, navigate]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
     if (name === 'telefone') setPhoneError(null);
   };
 
@@ -109,8 +114,10 @@ const ChangePage: React.FC = () => {
               readOnly
               name="fornecedor"
               value={formData.fornecedor}
-              className="w-full px-5 py-4 glass-input rounded-xl opacity-70 cursor-not-allowed font-bold text-primary"
+              className="w-full px-5 py-4 glass-input rounded-xl opacity-70 cursor-not-allowed font-bold text-primary mb-3"
             />
+
+
           </div>
 
           <div className="md:col-span-2">
@@ -164,9 +171,20 @@ const ChangePage: React.FC = () => {
               name="email"
               value={formData.email}
               onChange={handleInputChange}
-              className="w-full px-5 py-4 glass-input rounded-xl"
+              className="w-full px-5 py-4 glass-input rounded-xl mb-3"
               placeholder="exemplo@email.com"
             />
+
+            <label className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5 cursor-pointer hover:bg-white/10 transition-colors">
+              <input
+                type="checkbox"
+                name="faturaEletronica"
+                checked={formData.faturaEletronica}
+                onChange={handleInputChange}
+                className="w-5 h-5 rounded border-gray-500 bg-transparent text-primary focus:ring-primary focus:ring-offset-0"
+              />
+              <span className="text-gray-300 font-medium">Aceito receber a fatura eletrónica (recomendado)</span>
+            </label>
           </div>
 
           <div className="md:col-span-2">
@@ -181,28 +199,46 @@ const ChangePage: React.FC = () => {
             />
           </div>
 
-          <div>
-            <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-widest">Código CPE</label>
-            <input
-              required
-              name="cpe"
-              value={formData.cpe}
-              onChange={handleInputChange}
-              className="w-full px-5 py-4 glass-input rounded-xl"
-              placeholder="Ex: PT0002..."
-            />
+          <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-widest">Código CPE</label>
+              <input
+                required
+                name="cpe"
+                value={formData.cpe}
+                onChange={handleInputChange}
+                className="w-full px-5 py-4 glass-input rounded-xl"
+                placeholder="Ex: PT0002..."
+              />
+            </div>
+
+            <div className="flex flex-col justify-end">
+              <label className="flex items-center gap-3 p-4 bg-white/5 rounded-xl border border-white/5 cursor-pointer hover:bg-white/10 transition-colors h-[58px]">
+                <input
+                  type="checkbox"
+                  name="debitoDireto"
+                  checked={formData.debitoDireto}
+                  onChange={handleInputChange}
+                  className="w-5 h-5 rounded border-gray-500 bg-transparent text-primary focus:ring-primary focus:ring-offset-0"
+                />
+                <span className="text-gray-300 font-medium">Aderir ao Débito Direto</span>
+              </label>
+            </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-widest">IBAN (Opcional)</label>
-            <input
-              name="iban"
-              value={formData.iban}
-              onChange={handleInputChange}
-              className="w-full px-5 py-4 glass-input rounded-xl"
-              placeholder="PT50..."
-            />
-          </div>
+          {formData.debitoDireto && (
+            <div className="md:col-span-2 animate-in slide-in-from-top-2 fade-in duration-300">
+              <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-widest">IBAN</label>
+              <input
+                required
+                name="iban"
+                value={formData.iban}
+                onChange={handleInputChange}
+                className="w-full px-5 py-4 glass-input rounded-xl border border-primary/30 shadow-[0_0_15px_rgba(var(--primary-rgb),0.1)]"
+                placeholder="PT50..."
+              />
+            </div>
+          )}
         </div>
 
         <div className="mt-8 flex items-start gap-4 p-4 bg-white/5 rounded-xl border border-white/5">
