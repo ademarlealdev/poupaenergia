@@ -1,5 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
+import { supabase } from '../services/supabaseClient';
 
 interface SimulationResult {
     comercializador: string;
@@ -54,13 +55,19 @@ const SimulationPage: React.FC = () => {
         const fetchSimulation = async () => {
             setLoading(true);
             try {
-                const response = await fetch(
-                    `http://127.0.0.1:5000/api/simulation?power_id=${powerId}&cycle=${cycle}&e_ponta=${ePonta}&e_cheias=${eCheias}&e_vazio=${eVazio}`
-                );
-                if (!response.ok) throw new Error('Falha ao obter dados da simulação');
-                const data = await response.json();
-                if (data.error) throw new Error(data.error);
-                console.log('Received simulation data:', data);
+                // Use Supabase Edge Function for global accessibility
+                const { data, error } = await supabase.functions.invoke('erse-simulation', {
+                    body: {
+                        power_id: powerId,
+                        cycle: cycle,
+                        e_ponta: ePonta,
+                        e_cheias: eCheias,
+                        e_vazio: eVazio
+                    }
+                });
+
+                if (error) throw error;
+                console.log('Received simulation data from Edge Function:', data);
                 setResults(data);
             } catch (err: any) {
                 console.error('Simulation error:', err);
@@ -70,7 +77,9 @@ const SimulationPage: React.FC = () => {
             }
         };
 
-        fetchSimulation();
+        if (powerId && cycle) {
+            fetchSimulation();
+        }
     }, [powerId, cycle, ePonta, eCheias, eVazio]);
 
     const getConsumptionText = () => {
@@ -269,8 +278,8 @@ const SimulationPage: React.FC = () => {
                                     </div>
                                     <div className="flex flex-col items-end gap-1">
                                         <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all ${offer.ciclo === "1" || offer.ciclo === "Simples" ? "border-emerald-500/30 text-emerald-400 bg-emerald-500/5" :
-                                                offer.ciclo === "2" || offer.ciclo?.includes("Bi") ? "border-blue-500/30 text-blue-400 bg-blue-500/5" :
-                                                    "border-purple-500/30 text-purple-400 bg-purple-500/5"
+                                            offer.ciclo === "2" || offer.ciclo?.includes("Bi") ? "border-blue-500/30 text-blue-400 bg-blue-500/5" :
+                                                "border-purple-500/30 text-purple-400 bg-purple-500/5"
                                             }`}>
                                             {offer.ciclo === "1" || offer.ciclo === "Simples" ? "Simples" :
                                                 offer.ciclo === "2" || offer.ciclo?.includes("Bi") ? "Bi-Horária" : "Tri-Horária"}

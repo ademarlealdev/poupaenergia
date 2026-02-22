@@ -9,7 +9,20 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from simulation_run import get_simulation_data
 
 app = Flask(__name__)
-CORS(app) # Enable CORS for all routes
+# Enable CORS for all routes and handle Private Network Access (PNA) preflight
+CORS(app)
+
+@app.after_request
+def add_cors_headers(response):
+    # Allow Private Network Access (PNA)
+    if request.headers.get('Access-Control-Request-Private-Network') == 'true':
+        response.headers['Access-Control-Allow-Private-Network'] = 'true'
+    
+    # Ensure CORS headers are robust for cross-device access
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+    return response
 
 @app.route('/api/simulation', methods=['GET'])
 def simulation():

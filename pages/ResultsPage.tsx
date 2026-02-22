@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { BillData } from '../types';
+import { supabase } from '../services/supabaseClient';
 
 interface SimulationResult {
   comercializador: string;
@@ -81,16 +82,22 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ data: initialData }) => {
           eVazio = data.consumoVazio || (data.consumoMensalKwh * 0.4);
         }
 
-        const url = `http://127.0.0.1:5000/api/simulation?power_id=${powerId}&cycle=${cycleId}&e_ponta=${Math.round(ePonta)}&e_cheias=${Math.round(eCheias)}&e_vazio=${Math.round(eVazio)}`;
+        // Use Supabase Edge Function for global accessibility
+        const { data: simData, error: simError } = await supabase.functions.invoke('erse-simulation', {
+          body: {
+            power_id: powerId,
+            cycle: cycleId,
+            e_ponta: Math.round(ePonta),
+            e_cheias: Math.round(eCheias),
+            e_vazio: Math.round(eVazio)
+          }
+        });
 
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('Falha ao obter simulação ERSE');
-        const simData = await response.json();
-        console.log('Results fetched from API:', simData);
+        if (simError) throw simError;
+        console.log('Results fetched from Edge Function:', simData);
+
         if (Array.isArray(simData)) {
           setResults(simData);
-        } else if (simData.error) {
-          throw new Error(simData.error);
         } else {
           setResults([]);
         }
@@ -293,8 +300,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ data: initialData }) => {
                   </div>
                   <div className="flex flex-col items-end gap-1">
                     <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all ${offer.ciclo === "1" || offer.ciclo === "Simples" ? "border-emerald-500/30 text-emerald-400 bg-emerald-500/5" :
-                        offer.ciclo === "2" || offer.ciclo?.includes("Bi") ? "border-blue-500/30 text-blue-400 bg-blue-500/5" :
-                          "border-purple-500/30 text-purple-400 bg-purple-500/5"
+                      offer.ciclo === "2" || offer.ciclo?.includes("Bi") ? "border-blue-500/30 text-blue-400 bg-blue-500/5" :
+                        "border-purple-500/30 text-purple-400 bg-purple-500/5"
                       }`}>
                       {offer.ciclo === "1" || offer.ciclo === "Simples" ? "Simples" :
                         offer.ciclo === "2" || offer.ciclo?.includes("Bi") ? "Bi-Horária" : "Tri-Horária"}
